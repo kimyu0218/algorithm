@@ -9,13 +9,13 @@ int isGroup(string word) { // 그룹 여부 확인
     alphabet.assign(26, false);
 
     char pre = word[0];
-    alphabet[pre-97] = true;
+    alphabet[pre-'a'] = true;
     for(int i = 1; i < word.length(); i++) {
         char tmp = word[i];
         if(tmp != pre) {
-            if(alphabet[tmp-97]) return 0;
+            if(alphabet[tmp-'a']) return 0;
             else {
-                alphabet[tmp-97] = true;
+                alphabet[tmp-'a'] = true;
                 pre = tmp;
             }
         }

@@ -3,25 +3,25 @@
 #include <algorithm>
 
 using namespace std;
-struct cor{ // 좌표 구조체
-    int x, y;
-};
-vector<cor> xy;
+vector<pair<int, int>> xy;
 
-bool cmp(const cor &p1, const cor &p2) {
-    if(p1.y != p2.y) return p1.y < p2.y; // y 좌표 오름차순
-    return p1.x < p2.x; // x 좌표 오름차순
+bool cmp(const pair<int, int> &p1, const pair<int, int> &p2) {
+    if(p1.second != p2.second) return p1.second < p2.second; // y 좌표 오름차순
+    return p1.first < p2.first; // x 좌표 오름차순
 }
 
 int main() {
-    int n;
+    int n, x, y;
     cin >> n;
+
     xy.assign(n, {0, 0});
-    for(int i = 0; i < n; i++)
-        cin >> xy[i].x >> xy[i].y;
+    for(int i = 0; i < n; i++) {
+        cin >> x >> y;
+        xy[i] = make_pair(x,y);
+    }
 
     sort(xy.begin(), xy.end(), cmp); // 정렬
     for(int i = 0; i < n; i++)
-        cout << xy[i].x << ' ' << xy[i].y << '\n';
+        cout << xy[i].first << ' ' << xy[i].second << '\n';
     return 0;
 }

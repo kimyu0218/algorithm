@@ -10,8 +10,8 @@ long long countSupervisor(int n, int b, int c) { // 감독관 수 세기
         a[i] -= b;
         result++; // 총감독관
         if(a[i] > 0) { // 부감독관
-            if(a[i] % c == 0) result += a[i]/c;
-            else result += (a[i]/c + 1);
+            result += a[i]/c;
+            if(a[i] % c) result++;
         }
     }
     return result;
