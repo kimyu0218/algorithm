@@ -1,29 +1,26 @@
 #include <iostream>
 #include <vector>
-#include <set>
 #include <algorithm>
 
 using namespace std;
-vector<int> cor;
-set<int> s;
+vector<int> v, sorted;
 
 int main() {
-    int n;
+    int n, tmp;
     cin >> n;
 
-    cor.assign(n, 0);
-    for(int i = 0; i < n; i++) {
-        cin >> cor[i];
-        s.insert(cor[i]);
+    while(n--) { // 좌표 입력
+        cin >> tmp;
+        sorted.push_back(tmp);
+        v.push_back(tmp);
     }
 
-    for(int i = 0; i < n; i++) {
-        int j = 0;
-        for(auto iter = s.begin(); iter != s.end(); iter++) {
-            if(*iter == cor[i]) break;
-            j++;
-        }
-        cout << j << ' ';
+    sort(sorted.begin(), sorted.end()); // 오름차순 정렬
+    sorted.erase(unique(sorted.begin(), sorted.end()), sorted.end()); // 중복 제거
+
+    for(int & iter : v) {
+        int order = lower_bound(sorted.begin(), sorted.end(), iter) - sorted.begin(); // bst 기반 탐색
+        cout << order << ' ';
     }
     return 0;
 }
