@@ -1,63 +1,62 @@
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
-bool slide(int n, int start, int end, int height, vector<int> line, vector<bool> &visited) { // 경사로를 설치할 수 있는가
-    if(start < 0 || end > n) return false;
+const int WHEEL = 4;
+int pointer[WHEEL+1][2]; // (0 : 오른쪽 톱니바퀴와 맞닿는 부분, 1 : 왼쪽 톱니바퀴와 맞닿는 부분)
+int cogwheel[WHEEL+1][8];
 
-    for(int i = start; i <= end; i++) {
-        if(visited[i]) return false; // 이미 경사로가 설치되어 있는 경우
-        if(line[i] != height) return false; // 경사로 설치할 수 없는 경우 (평지 아님)
-        visited[i] = true;
+void set_pointer() {
+    for(int i = 1; i <= WHEEL; i++) {
+        pointer[i][0] = 2;
+        pointer[i][1] = 6;
     }
-    return true;
 }
 
-bool check(int n, int l, vector<int> line) { // 길을 만들 수 있는가
-    int pre = line[0];
-    vector<bool> visited(n, false);
+void rotate(int num, int dir, int pre) { // (pre : num 톱니바퀴를 회전시키는 톱니바퀴)
+    // 1. num 톱니바퀴가 회전하기 전에 왼쪽, 오른쪽 톱니바퀴 회전시킬지 판단
+    // 인접한 왼쪽 톱니바퀴 회전
+    if(pre != num-1 && num-1 >= 1 && cogwheel[num][pointer[num][1]] != cogwheel[num-1][pointer[num-1][0]]) rotate(num-1, -dir, num);
+    // 인접한 오른쪽 톱니바퀴 회전
+    if(pre != num+1 && num+1 <= WHEEL && cogwheel[num][pointer[num][0]] != cogwheel[num+1][pointer[num+1][1]]) rotate(num+1, -dir, num);
 
-    for(int i = 1; i < n; i++) {
-        // 1. 높이 2 이상 차이 나는 경우
-        if(abs(line[i] - pre) > 1) return false;
-        // 2. 올라가는 방향으로 경사로 설치
-        else if(pre < line[i]) {
-            if(!slide(n, i-l, i-1, pre, line, visited)) return false;
-            pre = line[i];
-        }
-        // 3. 내려가는 방향으로 경사로 설치
-        else if(pre > line[i]) { // 3. down
-            if(!slide(n, i, i+l-1, line[i], line, visited)) return false;
-            pre = line[i]; i += (l-1);
-        }
+    // 2. num 톱니바퀴 회전
+    if(dir == 1) { // 시계 방향 회전 (1)
+        pointer[num][0] = (pointer[num][0] + 7) % 8;
+        pointer[num][1] = (pointer[num][1] + 7) % 8;
     }
-    return true;
+    else { // 반시계 방향 회전 (-1)
+        pointer[num][0] = (pointer[num][0] + 1) % 8;
+        pointer[num][1] = (pointer[num][1] + 1) % 8;
+    }
 }
 
-int cnt_route(int n, int l, vector<vector<int>> map) { // 지나갈 수 있는 길 개수
-    int cnt = 0;
-    // 가로줄 검사
-    for(int i = 0; i < n; i++) cnt += check(n, l, map[i]);
-    // 세로줄 검사
-    for(int i = 0; i < n; i++) {
-        vector<int> line;
-        for(int j = 0; j < n; j++) line.push_back(map[j][i]);
-        cnt += check(n, l, line);
+int compute_score() { // 점수 계산
+    int score = 0, round_score = 1; // 총 획득한 점수, 라운드별 점수
+    for(int i = 1; i <= WHEEL; i++) {
+        int twelve = (pointer[i][0] + 6) % 8;
+        if(cogwheel[i][twelve]) score += round_score;
+        round_score *= 2;
     }
-    return cnt;
+    return score;
 }
 
 int main() {
-    int n, l;
-    cin >> n >> l;
+    string input;
+    for(int i = 1; i <= WHEEL; i++) { // 톱니바퀴 정보 입력
+        cin >> input;
+        for(int j = 0; j < 8; j++)
+            cogwheel[i][j] = input[j] - '0';
+    }
+    set_pointer();
 
-    vector<vector<int>> map (n, vector<int> (n, 0));
-    for(int i = 0; i < n; i++) { // 지도 입력
-        for(int j = 0; j < n; j++)
-            cin >> map[i][j];
+    int k, num, dir;
+    cin >> k;
+    for(int i = 0; i < k; i++) { // 회전
+       cin >> num >> dir;
+        rotate(num, dir, num);
     }
 
-    cout << cnt_route(n, l, map);
+    cout << compute_score(); // 점수 출력
     return 0;
 }
