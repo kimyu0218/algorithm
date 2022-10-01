@@ -84,16 +84,6 @@ void tornado(int row, int col, int dir, int size) {
     tornado(row, col, next_dir, size);
 }
 
-int cntRemain() {
-    int remain = 0;
-    for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            remain += sand[i][j];
-        }
-    }
-    return remain;
-}
-
 int main() {
     cin >> n;
     for(int i = 0; i < n; i++) { // 모래 입력
