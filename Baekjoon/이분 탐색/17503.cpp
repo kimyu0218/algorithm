@@ -31,8 +31,8 @@ pq beerList(int level, int k) { // 간 레벨이 level일 때 마실 수 있는 
     return list;
 }
 
-ll likeSum(int n, pq beerList) {
-    ll sum = 0;
+int likeSum(int n, pq beerList) {
+    int sum = 0;
     while(n--) {
         sum += beerList.top().first;
         beerList.pop();
@@ -40,17 +40,18 @@ ll likeSum(int n, pq beerList) {
     return sum;
 }
 
-int binarySearch(int left, int right, int n, int m, int k) {
+int binarySearch(ll left, ll right, int n, int m, int k) {
     int answer = -1;
     while(left <= right) {
-        int mid = (left + right) / 2; // 간 레벨
+        ll mid = (left + right) / 2; // 간 레벨
         pq beer_list = beerList(mid, k); // 간 레벨이 mid일 때 마실 수 있는 맥주 목록
 
         if(beer_list.size() < n) { // 1. n개 마시지 못함 -> 간 레벨 올리기
             left = mid + 1;
             continue;
         }
-        ll sum = likeSum(n, beer_list);
+
+        int sum = likeSum(n, beer_list);
         if(sum >= m) { // 2. 선호도 만족 -> 간 레벨 낮추기
             answer = mid;
             right = mid - 1;
