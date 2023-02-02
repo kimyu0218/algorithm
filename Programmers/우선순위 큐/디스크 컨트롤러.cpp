@@ -17,7 +17,7 @@ int solution(vector<vector<int>> jobs) {
     int total_time = 0;
     int job_idx = 0;
     int cnt = jobs.size();
-    priority_queue<vector<int>, vector<vector<int>>, cmp> pq; // 소요시간 오름차순
+    priority_queue<vector<int>, vector<vector<int>>, cmp> pq; // 현재 시점에 실행할 수 있는 작업 저장 (소요시간 오름차순)
     sort(jobs.begin(), jobs.end()); // 요청시간 오름차순
 
     while(job_idx < cnt || !pq.empty()) {
