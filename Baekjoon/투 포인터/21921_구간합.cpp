@@ -15,8 +15,13 @@ int main() {
 
     for(int i = x; i <= n; i++) {
         int tmp = sum[i] - sum[i-x]; // i-x부터 x일간 방문자 수
-        if(tmp > max) { max = tmp; cnt = 1; } // 최대 방문자 수 갱신
-        else if(tmp == max) cnt++; // 최대 방문자 수가 같은 경우 기간 개수 갱신
+        if(tmp > max) { // 최대 방문자 수 갱신
+            max = tmp;
+            cnt = 1;
+        }
+        else if(tmp == max) { // 최대 방문자 수가 같은 경우 기간 개수 갱신
+            cnt++;
+        }
     }
 
     if(max) cout << max << '\n' << cnt << '\n';
