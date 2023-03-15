@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <vector>
 #include <queue>
@@ -6,12 +7,11 @@ using namespace std;
 
 // 최대 힙과 최소 힙 싱크 맞추기
 void sync(priority_queue<int> &max_pq, priority_queue<int, vector<int>, greater<>> &min_pq) {
-    // max_top() < min_top() : 최소 힙에서 삭제된 값이 최대 힙에 들어있음
-    while(!max_pq.empty() && max_pq.top() < min_pq.top()) {
+    // max_top() < min_top()
+    // 1. 최소 힙에서 삭제된 값이 최대 힙에 들어있음
+    // 2. 최대 힙에서 삭제된 값이 최소 힙에 들어있음
+    while(!max_pq.empty() && !min_pq.empty() && max_pq.top() < min_pq.top()) {
         max_pq.pop();
-    }
-    // min_top() > max_top() : 최대 힙에서 삭제된 값이 최소 힙에 들어있음
-    while(!min_pq.empty() && min_pq.top() > max_pq.top()) {
         min_pq.pop();
     }
 }
