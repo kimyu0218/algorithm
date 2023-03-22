@@ -9,20 +9,30 @@ vector<int> t; // 심사 시간
 
 // m명의 사람이 심사를 마치는데 걸리는 최소 시간은?
 // == 심사 시간이 k일 때 m명의 사람의 사람을 심사할 수 있는가?
-ll cnt_pass(ll k, int n) {
+bool canPass(ll k, int n, int m) {
+    /*
+     * 오버 플로우 발생 지점 : cnt
+     * k는 최대 10^18
+     * n은 최대 10^5
+     * t[i]가 모두 1이라고 했을 때, cnt는 10^5 * 10^18을 수용할 수 있어야 함 -> ll 범위 벗어남
+    */
     ll cnt = 0;
-    for(int i = 0; i < n; i++)
+    for(int i = 0; i < n; i++) {
         cnt += k/t[i];
-    return cnt;
+        if(cnt >= m) { // m명 심사 가능
+            return true;
+        }
+    }
+    return (cnt >= m);
 }
 
 ll min_time(ll left, ll right, int n, int m) {
     ll ans = 0;
     while(left <= right) {
         ll mid = (left + right) / 2;
-        ll pass = cnt_pass(mid, n);
+        bool pass = canPass(mid, n, m);
 
-        if(pass >= m) { // 1. m명 이상의 사람 통과 -> 총 심사 시간 줄이기
+        if(pass) { // 1. m명 이상의 사람 통과 -> 총 심사 시간 줄이기
             ans = mid;
             right = mid - 1;
         }
@@ -32,6 +42,9 @@ ll min_time(ll left, ll right, int n, int m) {
 }
 
 int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+
     int n, m;
     cin >> n >> m;
 
