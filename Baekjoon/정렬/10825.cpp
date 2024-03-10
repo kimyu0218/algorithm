@@ -4,33 +4,50 @@
 
 using namespace std;
 
-typedef struct student{
+struct student {
     string name;
-    int kor, eng, math;
-}s;
-vector<s> students;
+    int korean, math, english;
+};
 
-bool cmp(s &s1, s &s2) {
-    // 1. 국어 점수 감소하는 순서
-    if(s1.kor != s2.kor) return s1.kor > s2.kor;
-    // 2. 영어 점수 증가하는 순서
-    if(s1.eng != s2.eng) return s1.eng < s2.eng;
-    // 3. 수학 점수 감소하는 순서
-    if(s1.math != s2.math) return s1.math > s2.math;
-    // 4. 이름 사전순 증가
+bool cmp(student &s1, student &s2) {
+    if(s1.korean != s2.korean) {
+        return s1.korean > s2.korean;
+    }
+    if(s1.english != s2.english) {
+        return s1.english < s2.english;
+    }
+    if(s1.math != s2.math) {
+        return s1.math > s2.math;
+    }
     return s1.name < s2.name;
+}
+
+vector<string> solution(vector<student> students) {
+    vector<string> result;
+
+    int n = students.size();
+    sort(students.begin(), students.end(), cmp);
+
+    for(int i = 0; i < n; i++) {
+        result.push_back(students[i].name);
+    }
+    return result;
 }
 
 int main() {
     int n;
+    vector<student> students;
+
     cin >> n;
 
     students.assign(n, {"", 0, 0, 0});
-    for(int i = 0; i < n; i++)
-        cin >> students[i].name >> students[i].kor >> students[i].eng >> students[i].math;
+    for(int i = 0; i < n; i++) {
+        cin >> students[i].name >> students[i].korean >> students[i].english >> students[i].math;
+    }
 
-    sort(students.begin(), students.end(), cmp);
-    for(int i = 0; i < n; i++)
-        cout << students[i].name << '\n';
+    vector<string> sorted = solution(students);
+    for(int i = 0; i < n; i++) {
+        cout << sorted[i] << '\n';
+    }
     return 0;
 }

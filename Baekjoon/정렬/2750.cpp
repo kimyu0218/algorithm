@@ -1,23 +1,28 @@
 #include <iostream>
 #include <vector>
-#include <algorithm> // algorithm의 sort 알고리즘 이용
+#include <algorithm>
 
 using namespace std;
 
+vector<int> solution(vector<int> num) {
+    sort(num.begin(), num.end());
+    return num;
+}
+
 int main() {
     int n;
+    vector<int> num;
+
     cin >> n;
 
-    vector<int> arr;
-    arr.assign(n, 0);
+    num.assign(n, 0);
+    for(int i = 0; i < n; i++) {
+        cin >> num[i];
+    }
 
-    for (int i = 0; i < n; i++)
-        cin >> arr[i];
-
-    sort(arr.begin(), arr.end()); // 오름차순 정렬
-
-    for(int i = 0; i < n; i++)
-        cout << arr[i] << '\n';
-
+    vector<int> sorted = solution(num);
+    for(int i = 0; i < n; i++) {
+        cout << sorted[i] << '\n';
+    }
     return 0;
 }
