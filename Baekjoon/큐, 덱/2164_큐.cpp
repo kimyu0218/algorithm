@@ -3,28 +3,30 @@
 
 using namespace std;
 
-int main() {
-    int n;
-    cin >> n;
-
+int solution(int n) {
     queue<int> q;
-    for(int i = 1; i <= n; i++) q.push(i); // 카드 오름차순으로 push
 
+    for(int i = 1; i <= n; i++) {
+        q.push(i);
+    }
     while(true) {
-        // 1. 맨 앞의 숫자 버리기
         if(q.size() == 1) {
-            cout << q.front();
-            break;
+            return q.front();
         }
         q.pop();
-
-        // 2. 맨 앞의 숫자 맨 뒤로 옮기기
         if(q.size() == 1) {
-            cout << q.front();
-            break;
+            return q.front();
         }
-        int front = q.front(); q.pop();
-        q.push(front);
+        q.push(q.front());
+        q.pop();
     }
+}
+
+int main() {
+    int n;
+
+    cin >> n;
+
+    cout << solution(n);
     return 0;
 }

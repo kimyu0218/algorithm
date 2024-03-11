@@ -4,63 +4,75 @@
 
 using namespace std;
 
-void print(deque<string> &d) { // 출력
-    while(d.size() != 1) {
-        cout << d.front() << ",";
-        d.pop_front();
-    }
-    cout << d.front(); // 마지막 숫자 출력
-}
+deque<string> init_deque(string input) {
+    deque<string> result;
 
-void printReverse(deque<string> &d) { // 역순으로 출력
-    while(d.size() != 1) {
-        cout << d.back() << ",";
-        d.pop_back();
-    }
-    cout << d.back(); // 마지막 숫자 출력
-}
-
-void initializeDeque(deque<string> &d, string arr) { // 덱 초기화
-    string num = ""; // 숫자 임의로 저장하는 변수
-    for(int i = 1; i < arr.length()-1; i++) {
-        if(arr[i] == ',') {
-            d.push_back(num);
+    string num = "";
+    for(int i = 1; i < input.length() - 1; i++) {
+        char ch = input[i];
+        if(ch == ',') {
+            result.push_back(num);
             num = "";
+            continue;
         }
-        else num += arr[i];
-        if(i == arr.length() - 2) d.push_back(num); // 마지막 숫자 push
+        num += ch;
     }
+    if(num != "") {
+        result.push_back(num);
+    }
+    return result;
+}
+
+string make_vector_string(bool is_reverse, deque<string> dq) {
+    string result = "";
+
+    if(is_reverse) {
+        while(!dq.empty()) {
+            result += dq.back() + ',';
+            dq.pop_back();
+        }
+        return '[' + result.substr(0, result.length() - 1) + ']';
+    }
+    while(!dq.empty()) {
+        result += dq.front() + ',';
+        dq.pop_front();
+    }
+    return '[' + result.substr(0, result.length() - 1) + ']';
+}
+
+string solution(string p, string x) {
+    deque<string> dq = init_deque(x);
+    ㅏㅏ
+    bool is_reverse = false;
+    for(int i = 0; i < p.length(); i++) {
+        char ch = p[i];
+        if(ch == 'R') {
+            is_reverse = !is_reverse;
+            continue;
+        }
+        if(dq.empty()) {
+            return "error";
+        }
+        if(is_reverse) {
+            dq.pop_back();
+        }
+        else {
+            dq.pop_front();
+        }
+    }
+    return make_vector_string(is_reverse, dq);
 }
 
 int main() {
     int t, n;
+    string p, x;
+
     cin >> t;
 
-    string p, arr;
     while(t--) {
-        cin >> p >> n >> arr;
+        cin >> p >> n >> x;
 
-        bool reverse = false, error = false;
-        deque<string> d;
-        initializeDeque(d, arr); // 덱 초기화
-
-        for(char i : p) { // 함수 실행
-            // 1. 뒤집기
-            if(i == 'R') reverse = !reverse;
-            // 2. 버리기
-            else if(i == 'D') {
-                if(d.empty()) { error = true; break; } // error 발생하는 경우
-                if(reverse) d.pop_back();
-                else d.pop_front();
-            }
-        }
-        if(error) cout << "error\n";
-        else {
-            cout << "[";
-            if(reverse && !d.empty()) printReverse(d); // 역순으로 출력
-            else if(!reverse && !d.empty()) print(d); // 출력
-            cout << "]\n";
-        }
+        cout << solution(p, x) << '\n';
     }
     return 0;
 }
