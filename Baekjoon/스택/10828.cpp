@@ -4,30 +4,34 @@
 using namespace std;
 
 int main() {
-    int n, input;
-    cin >> n;
-
+    int n, x;
+    string cmd;
     stack<int> s;
 
-    string command;
+    cin >> n;
+
     while(n--) {
-        cin >> command;
-        if(command == "push") {
-            cin >> input;
-            s.push(input);
+        cin >> cmd;
+
+        if(cmd == "push") {
+            cin >> x;
+            s.push(x);
         }
-        else if(command == "pop") {
-            if(s.empty()) cout << -1 << '\n';
-            else {
-                cout << s.top() << '\n';
+        else if(cmd == "pop" || cmd == "top") {
+            if(s.empty()) {
+                cout << -1 << '\n';
+                continue;
+            }
+            cout << s.top() << '\n';
+            if(cmd == "pop") {
                 s.pop();
             }
         }
-        else if(command == "size") cout << s.size() << '\n';
-        else if(command == "empty") cout << s.empty() << '\n';
-        else if(command == "top") {
-            if(s.empty()) cout << -1 << '\n';
-            else cout << s.top() << '\n';
+        else if(cmd == "size") {
+            cout << s.size() << '\n';
+        }
+        else if(cmd == "empty") {
+            cout << s.empty() << '\n';
         }
     }
     return 0;
