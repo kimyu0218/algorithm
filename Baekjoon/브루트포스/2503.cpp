@@ -1,65 +1,68 @@
 #include <iostream>
 #include <vector>
-#include <string>
 
 using namespace std;
 
+const int MIN = 123;
 const int MAX = 987;
-bool possible[MAX+1] = { false, }; // 답변 가능 여부 저장하는 배열
 
-struct baseball{
+struct info {
     string num;
     int strike, ball;
 };
 
-pair<int, int> cmp(string s1, string s2) {
-    int strike = 0, ball = 0;
-    for(int i = 0; i < 3; i++) {
-        if(s1[i] == s2[i]) strike++; // 스트라이크 카온트
-        else if(s1.find(s2[i]) != string::npos) ball++; // 볼 카운트
+bool is_valid_answer(string answer) {
+    if(answer.find('0') != string::npos) {
+        return false;
     }
-    return {strike, ball};
+    return answer[0] != answer[1] && answer[0] != answer[2] && answer[1] != answer[2];
 }
 
-void game(vector<baseball> &q, int n) {
-    for(int i = 123; i <= 987; i++) {
-        string s = to_string(i);
+bool is_possible_answer(string answer, vector<info> minhyuk) {
+    for(int i = 0; i < minhyuk.size(); i++) {
+        int strike = 0;
+        int ball = 0;
 
-        // 1. 1부터 9 사이의 서로 다른 수를 만족하지 못하는 경우
-        if(s[0] == '0' || s[1] == '0' || s[2] == '0') continue;
-        if(s[0] == s[1] || s[1] == s[2] || s[2] == s[0]) continue;
-
-        // 2. i가 민혁이의 물음들과 스트라이크, 볼 수가 일치하는가
-        bool flag = true;
-        for(int j = 0; j < n; j++) { // question과 비교
-            pair<int, int> tmp = cmp(s, q[j].num);
-            if(q[j].strike != tmp.first || q[j].ball != tmp.second) { // 2-1. 가능성 없는 답변
-                flag = false;
-                break;
+        string minhyuk_answer = minhyuk[i].num;
+        for(int j = 0; j < 3; j++) {
+            if(answer[j] == minhyuk_answer[j]) {
+                strike++;
+            }
+            else if(minhyuk_answer.find(answer[j]) != string::npos) {
+                ball++;
             }
         }
-        if(flag) possible[i] = true; // 2-2. 가능성 있는 답변
+
+        if(strike != minhyuk[i].strike || ball != minhyuk[i].ball) {
+            return false;
+        }
     }
+    return true;
 }
 
-int possible_cnt() { // 가능한 답변 개수 세기
-    int cnt = 0;
-    for(int i = 123; i <= 987; i++) {
-        if(possible[i]) cnt++;
+int solution(vector<info> minhyuk) {
+    int result = 0;
+    for(int i = MIN; i <= MAX; i++) {
+        string answer = to_string(i);
+        if(!is_valid_answer(answer)) {
+            continue;
+        }
+        result += is_possible_answer(answer, minhyuk);
     }
-    return cnt;
+    return result;
 }
 
 int main() {
-    int n, num, strike, ball;
+    int n;
+    vector<info> minhyuk;
+
     cin >> n;
 
-    vector<baseball> question;
-    question.assign(n, baseball{"", 0, 0});
-    for(int i = 0; i < n; i++)
-        cin >> question[i].num >> question[i].strike >> question[i].ball;
+    minhyuk.assign(n, {"", 0, 0});
+    for(int i = 0; i < n; i++) {
+        cin >> minhyuk[i].num >> minhyuk[i].strike >> minhyuk[i].ball;
+    }
 
-    game(question, n);
-    cout << possible_cnt();
+    cout << solution(minhyuk);
     return 0;
 }
