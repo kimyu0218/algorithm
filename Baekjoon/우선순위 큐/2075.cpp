@@ -3,28 +3,48 @@
 
 using namespace std;
 
+typedef priority_queue<int, vector<int>, greater<>> pq;
+
+pq init_priority_queue(int n, vector<int> &v) {
+    pq result;
+    for(int i = 0; i < n; i++) {
+        result.push(v[i]);
+    }
+    return result;
+}
+
+int solution(int n, vector<vector<int>> &v) {
+    pq big_n = init_priority_queue(n, v[0]);
+
+    for(int i = 1; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            if(v[i][j] <= big_n.top()) {
+                continue;
+            }
+            big_n.pop();
+            big_n.push(v[i][j]);
+        }
+    }
+    return big_n.top();
+}
+
 int main() {
     ios::sync_with_stdio(false);
-    cin.tie(NULL); cout.tie(NULL);
+    cin.tie(NULL);
+    cout.tie(NULL);
 
-    int n, x;
-    priority_queue<int, vector<int>, greater<>> pq; // top이 가장 작은 수를 가리킴
+    int n;
+    vector<vector<int>> v;
 
     cin >> n;
-    int N = n*n;
 
-    while(N--) {
-        cin >> x;
-        if(pq.size() == n) { // 우선순위 큐의 사이즈가 n인 경우
-            int top = pq.top(); // top : n번째로 큰 숫자
-            if(top < x) {
-                pq.pop();
-                pq.push(x);
-            }
+    v.assign(n, vector<int> (n, 0));
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            cin >> v[i][j];
         }
-        else pq.push(x);
     }
 
-    cout << pq.top();
+    cout << solution(n, v);
     return 0;
 }

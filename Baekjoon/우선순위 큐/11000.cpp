@@ -1,34 +1,40 @@
 #include <iostream>
-#include <vector>
 #include <queue>
 #include <algorithm>
 
 using namespace std;
-vector<pair<int, int>> time_table;
 
-int countRoom() { // 강의실 개수 세기
-    int idx = 0, time_cnt = time_table.size();
-    priority_queue<int, vector<int>, greater<>> room;
-    room.push(time_table[idx++].second); // 초기 강의실 세팅
+typedef pair<int, int> pi;
 
-    while(idx < time_cnt) {
-        if(room.top() <= time_table[idx].first) // (강의실 시간 갱신)
-            room.pop();
-        room.push(time_table[idx++].second); // 새로운 강의실
+int solution(vector<pi> timetable) {
+    sort(timetable.begin(), timetable.end());
+
+    priority_queue<int, vector<int>, greater<>> pq;
+    pq.push(timetable[0].second);
+
+    for(int i = 1; i < timetable.size(); i++) {
+        int s = timetable[i].first;
+        int t = timetable[i].second;
+
+        if(s >= pq.top()) {
+            pq.pop();
+        }
+        pq.push(t);
     }
-    return room.size();
+    return pq.size();
 }
 
 int main() {
-    int n, start, end;
+    int n;
+    vector<pi> timetable;
+
     cin >> n;
 
-    while(n--) { // 강의실 시간표 입력
-        cin >> start >> end;
-        time_table.push_back({start, end});
+    timetable.assign(n, {0, 0});
+    for(int i = 0; i < n; i++) {
+        cin >> timetable[i].first >> timetable[i].second;
     }
-    sort(time_table.begin(), time_table.end());
 
-    cout << countRoom();
+    cout << solution(timetable);
     return 0;
 }

@@ -1,62 +1,82 @@
 #include <iostream>
 #include <queue>
+#include <string>
 
 using namespace std;
 
-void delete_max(bool deleted[], priority_queue<pair<int, int>, vector<pair<int, int>>> &max) {
-    while(!max.empty() && deleted[max.top().second]) max.pop();
+typedef pair<int, int> pi;
+typedef priority_queue<pi> max_priority_queue;
+typedef priority_queue<pi, vector<pi>, greater<>> min_priority_queue;
+
+vector<bool> deleted;
+
+void pop_min_pq(min_priority_queue &pq) {
+    while(!pq.empty() && deleted[pq.top().second]) {
+        pq.pop();
+    }
+    if(pq.empty()) {
+        return;
+    }
+    int idx = pq.top().second;
+    deleted[idx] = true;
+    pq.pop();
 }
 
-void delete_min(bool deleted[], priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> &min) {
-    while(!min.empty() && deleted[min.top().second]) min.pop();
+void pop_max_pq(max_priority_queue &pq) {
+    while(!pq.empty() && deleted[pq.top().second]) {
+        pq.pop();
+    }
+    if(pq.empty()) {
+        return;
+    }
+    int idx = pq.top().second;
+    deleted[idx] = true;
+    pq.pop();
+}
+
+string get_result(max_priority_queue &max_pq, min_priority_queue &min_pq) {
+    while(!max_pq.empty() && deleted[max_pq.top().second]) {
+        max_pq.pop();
+    }
+    if(max_pq.empty()) {
+        return "EMPTY";
+    }
+    while(!min_pq.empty() && deleted[min_pq.top().second]) {
+        min_pq.pop();
+    }
+    return to_string(max_pq.top().first) + ' ' + to_string(min_pq.top().first);
 }
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(NULL); cout.tie(NULL);
-
     int t, k, n;
-    cin >> t; // 테스트 수
+    char cmd;
 
-    char op;
+    cin >> t;
+
     while(t--) {
-        cin >> k; // 입력 데이터 수
+        cin >> k;
 
-        bool deleted[k];
-        for(int i = 0; i < k; i++) deleted[i] = false;
+        deleted.assign(k, false);
+        max_priority_queue max_pq;
+        min_priority_queue min_pq;
 
-        // (first : 값 / second : 인덱스)
-        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> min;
-        priority_queue<pair<int, int>, vector<pair<int, int>>> max;
         for(int i = 0; i < k; i++) {
-            cin >> op >> n;
+            cin >> cmd >> n;
 
-            switch(op) {
-                case 'D': // 1. DELETE
-                    if(n == 1) { // 1-1. 최댓값 삭제
-                        delete_max(deleted, max);
-                        if(!max.empty()) {
-                            deleted[max.top().second] = true; // pop 표기
-                            max.pop();
-                        }
-                    }
-                    else if(n == -1) { // 1-2. 최솟값 삭제
-                        delete_min(deleted, min);
-                        if(!min.empty()) {
-                            deleted[min.top().second] = true; // pop 표기
-                            min.pop();
-                        }
-                    }
-                    break;
-                case 'I': // 2. INSERT
-                    min.push({n, i}); max.push({n, i});
-                    break;
+            if(cmd == 'I') {
+                max_pq.push({n, i});
+                min_pq.push({n, i});
+                continue;
+            }
+
+            if(n == -1 && !min_pq.empty()) {
+                pop_min_pq(min_pq);
+            }
+            else if(n == 1 && !max_pq.empty()) {
+                pop_max_pq(max_pq);
             }
         }
-        delete_max(deleted, max);
-        delete_min(deleted, min);
-        if(max.empty()) cout << "EMPTY\n";
-        else cout << max.top().first << ' ' << min.top().first << '\n';
+        cout << get_result(max_pq, min_pq) << '\n';
     }
     return 0;
 }

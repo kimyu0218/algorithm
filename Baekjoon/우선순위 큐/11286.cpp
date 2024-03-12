@@ -3,30 +3,27 @@
 
 using namespace std;
 
-struct cmp {
-    bool operator() (int a, int b) {
-        if(abs(a) != abs(b)) return abs(a) > abs(b); // 1. 절대값이 가장 작은 수
-        return a > b; // 2. 가장 작은 수
-    }
-};
+typedef pair<int, int> pi;
 
 int main() {
     int n, x;
+    priority_queue<pi, vector<pi>, greater<>> pq;
+
     cin >> n;
 
-    priority_queue<int, vector<int>, cmp> pq;
     while(n--) {
         cin >> x;
-        if(x == 0) {
-            if(pq.empty()) { // 배열이 비어있는 경우
-                cout << 0 << '\n';
-            }
-            else {
-                cout << pq.top() << '\n';
-                pq.pop();
-            }
+
+        if(x != 0) {
+            pq.push({ abs(x), x });
+            continue;
         }
-        else pq.push(x);
+        if(pq.empty()) {
+            cout << 0 << '\n';
+            continue;
+        }
+        cout << pq.top().second << '\n';
+        pq.pop();
     }
     return 0;
 }

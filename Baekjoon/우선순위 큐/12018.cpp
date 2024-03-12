@@ -3,45 +3,52 @@
 
 using namespace std;
 
-int min_mileage(int p, int l) { // 1. 최소한으로 필요한 마일리지 (p: 수강신청 인원, l: 최대 수강인원)
-    priority_queue<int, vector<int>, greater<>> pq; // 마일리지 우선순위 큐
-    int x;
+typedef long long ll;
+typedef priority_queue<ll, vector<ll>, greater<>> min_pq;
 
-    for(int i = 0; i < p; i++) {
-        cin >> x;
-        if(pq.size() == l) { // 수강인원이 다 찬 경우
-            int top = pq.top();
-            if(top < x) { // 우선순위 갱신
-                pq.pop();
-                pq.push(x);
-            }
-        }
-        else pq.push(x);
+min_pq init_pq(vector<int> &a) {
+    min_pq pq;
+    for(int i = 0; i < a.size(); i++) {
+        pq.push(a[i]);
     }
-    if(p < l) return 1;
-    else return pq.top();
+    return pq;
 }
 
-int count_lecture(int m, priority_queue<int, vector<int>, greater<>> pq) { // 2. 최대로 들을 수 있는 과목수
-    int cnt = 0;
+ll get_sum(min_pq pq) {
+    ll sum = 0;
     while(!pq.empty()) {
-        m -= pq.top();
-        if(m < 0) break;
-        cnt++;
+        sum += pq.top();
         pq.pop();
     }
-    return cnt;
+    return sum;
+}
+
+ll solution(int m, vector<int> a) {
+    min_pq pq = init_pq(a);
+
+    while(m--) {
+        ll x = pq.top();
+        pq.pop();
+        ll y = pq.top();
+        pq.pop();
+        ll sum = x + y;
+        pq.push(sum);
+        pq.push(sum);
+    }
+    return get_sum(pq);
 }
 
 int main() {
-    int n, m, p, l;
-    priority_queue<int, vector<int>, greater<>> mileage;
+    int n, m;
+    vector<int> a;
+
     cin >> n >> m;
 
+    a.assign(n, 0);
     for(int i = 0; i < n; i++) {
-        cin >> p >> l;
-        mileage.push(min_mileage(p, l));
+        cin >> a[i];
     }
-    cout << count_lecture(m, mileage);
+
+    cout << solution(m, a);
     return 0;
 }

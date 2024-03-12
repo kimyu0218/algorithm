@@ -3,31 +3,28 @@
 
 using namespace std;
 
-struct cmp {
-    bool operator() (int a, int b) {
-        return a < b; // 오름차순
-    }
-};
-
-int main () {
+int main() {
     ios::sync_with_stdio(false);
-    cin.tie(NULL); cout.tie(NULL);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
     int n, x;
-    priority_queue<int, vector<int>, cmp> pq; // cmp에 의해 top에 가장 큰 수가 위치함
+    priority_queue<int> pq;
 
     cin >> n;
     while(n--) {
         cin >> x;
-        if(x == 0) { // 1. pop 연산
-            if(pq.empty()) { // 1-1. 배열이 비어있는 경우
-                cout << 0 << '\n';
-            }
-            else { // 1-2. 배열에서 가장 큰 값 출력 후 pop
-                cout << pq.top() << '\n';
-                pq.pop();
-            }
+
+        if(x != 0) {
+            pq.push(x);
+            continue;
         }
-        else pq.push(x); // 2. push 연산
+        if(pq.empty()) {
+            cout << 0 << '\n';
+            continue;
+        }
+        cout << pq.top() << '\n';
+        pq.pop();
     }
     return 0;
 }
