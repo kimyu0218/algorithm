@@ -3,23 +3,33 @@
 
 using namespace std;
 
-int min_cnt(int cost, int n, vector<int> coin) {
-    int cnt = 0; // 동전 개수 저장하는 변수
-    for(int i = n-1; i >= 0; i--) {
-        if(coin[i] > cost) continue; // 나눌 수 없는 경우 pass
-        cnt += (cost / coin[i]);
-        cost %= coin[i]; // 잔액 계산
+int solution(int k, vector<int> a) {
+    int result = 0;
+    int idx = a.size() - 1;
+
+    while(k) {
+        int p = k / a[idx];
+        if(!p) {
+            idx--;
+            continue;
+        }
+        result += p;
+        k -= p * a[idx--];
     }
-    return cnt;
+    return result;
 }
 
 int main() {
     int n, k;
+    vector<int> a;
+
     cin >> n >> k;
 
-    vector<int> coin(n, 0);
-    for(int i = 0; i < n; i++) // 동전 금액 입력
-        cin >> coin[i];
-    cout << min_cnt(k, n, coin);
+    a.assign(n, 0);
+    for(int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+
+    cout << solution(k, a);
     return 0;
 }

@@ -4,37 +4,66 @@
 
 using namespace std;
 
-bool cmp(int &i1, int &i2) {
-    // 1. 10의 배수인 케이크 먼저
-    if((i1 % 10) && !(i2 % 10)) return false;
-    if(!(i1 % 10) && (i2 % 10)) return true;
-    // 2. 오름차순
-    return i1 < i2;
+const int LEN = 10;
+
+bool cmp(int &a1, int &a2) {
+    int q1 = a1 % LEN;
+    int q2 = a2 % LEN;
+
+    if(!q1 && q2) {
+        return true;
+    }
+    if(q1 && !q2) {
+        return false;
+    }
+    return a1 < a2;
 }
 
-int cake(int n, int m, vector<int> len) {
-    int cnt = 0; // 케이크 개수 저장하는 변수
+vector<int> longer_than_10(vector<int> a) {
+    vector<int> result;
 
-    for(int i = 0; i < n; i++) {
-        int cut = (len[i] % 10) ? len[i]/10 : len[i]/10-1; // i번째 케이크 자르는 횟수 (10보다 작은 길이 버림)
-        int piece = len[i]/10; // 길이 10짜리 케이크 개수
-
-        if(m - cut < 0) return (cnt + m);
-        cnt += piece; // 길이 10짜리 케이크 수 더하기
-        m -= cut; // 자른 횟수 지우기
+    for(int i = 0; i < a.size(); i++) {
+        if(a[i] <= LEN) {
+            continue;
+        }
+        result.push_back(a[i]);
     }
-    return cnt;
+    sort(result.begin(), result.end(), cmp);
+    return result;
+}
+
+int solution(int m, vector<int> a) {
+    int result = 0;
+
+    for(int i = 0; i < a.size(); i++) {
+        result += (a[i] == LEN);
+    }
+
+    vector<int> cutting = longer_than_10(a);
+
+    for(int i = 0; i < cutting.size(); i++) {
+        int piece = cutting[i] / LEN;
+        int cut = (cutting[i] % LEN) ? piece : piece - 1;
+        if(m < cut) {
+            return result + m;
+        }
+        result += piece;
+        m -= cut;
+    }
+    return result;
 }
 
 int main() {
     int n, m;
+    vector<int> a;
+
     cin >> n >> m;
 
-    vector<int> len(n, 0);
-    for(int i = 0; i < n; i++) // 케이크 길이 입력
-        cin >> len[i];
-    sort(len.begin(), len.end(), cmp);
+    a.assign(n, 0);
+    for(int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
 
-    cout << cake(n, m, len);
+    cout << solution(m, a);
     return 0;
 }

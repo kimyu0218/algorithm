@@ -3,62 +3,68 @@
 
 using namespace std;
 
-vector<vector<char>> a, b;
+const int SIZE = 3;
 
-void change(int row, int col) { // 3x3 부분 행렬 모든 원소 뒤집기
-    for(int i = row; i < row+3; i++) {
-        for(int j = col; j < col+3; j++) {
-            if(a[i][j] == '1') a[i][j] = '0';
-            else a[i][j] = '1';
-        }
-    }
-}
-
-bool check(int n, int m) { // 행렬 A와 행렬 B가 같은가
+bool is_same_matrix(int n, int m, vector<vector<int>> a, vector<vector<int>> b) {
     for(int i = 0; i < n; i++) {
         for(int j = 0; j < m; j++) {
-            if(a[i][j] != b[i][j]) return false;
+            if(a[i][j] != b[i][j]) {
+                return false;
+            }
         }
     }
     return true;
 }
 
-int compute(int n, int m) {
-    int cnt = 0;
-    for(int i = 0; i <= n-3; i++) {
-        for(int j = 0; j <= m-3; j++) {
-            if(a[i][j] != b[i][j]) { // 원소가 다른 경우 뒤집기
-                change(i, j);
-                cnt++;
-            }
+void flip(int sr, int sc, vector<vector<int>> &a) {
+    for(int i = sr; i < sr + SIZE; i++) {
+        for(int j = sc; j < sc + SIZE; j++) {
+            a[i][j] = !a[i][j];
         }
     }
-    if(!check(n, m)) return -1; // 행렬 A와 행렬 B가 다른 경우
-    return cnt;
+}
+
+int solution(vector<vector<int>> a, vector<vector<int>> b) {
+    int result = 0;
+    int n = a.size();
+    int m = a[0].size();
+
+    for(int i = 0; i <= n - SIZE; i++) {
+        for(int j = 0; j <= m - SIZE; j++) {
+            if(a[i][j] == b[i][j]) {
+                continue;
+            }
+            flip(i, j, a);
+            result++;
+        }
+    }
+    return is_same_matrix(n, m, a, b) ? result : -1;
 }
 
 int main() {
     int n, m;
+    vector<vector<int>> a;
+    vector<vector<int>> b;
+    string input;
+
     cin >> n >> m;
 
-    string tmp;
-    a.assign(n, vector<char> (m, 0));
-    b.assign(n, vector<char> (m, 0));
-
-    // 행렬 A 입력
+    a.assign(n, vector<int> (m, 0));
     for(int i = 0; i < n; i++) {
-        cin >> tmp;
-        for(int j = 0; j < m; j++)
-            a[i][j] = tmp[j];
+        cin >> input;
+        for(int j = 0; j < m; j++) {
+            a[i][j] = input[j] - '0';
+        }
     }
 
-    // 행렬 B 입력
+    b.assign(n, vector<int> (m, 0));
     for(int i = 0; i < n; i++) {
-        cin >> tmp;
-        for(int j = 0; j < m; j++)
-            b[i][j] = tmp[j];
+        cin >> input;
+        for(int j = 0; j < m; j++) {
+            b[i][j] = input[j] - '0';
+        }
     }
 
-    cout << compute(n, m);
+    cout << solution(a, b);
     return 0;
 }

@@ -4,26 +4,32 @@
 
 using namespace std;
 
-int triangle(int n, vector<int> straw) {
-    int result = -1;
-    for(int i = n-3; i >= 0; i--) {
-        // 삼각형 만족하지 않음 : 한 변의 길이가 다른 두 변의 길이의 합과 같거나 큼
-        if(straw[i] + straw[i+1] <= straw[i+2]) continue;
-        // 삼각형 만족
-        result = straw[i] + straw[i+1] + straw[i+2]; break;
+int solution(vector<int> straws) {
+    sort(straws.begin(), straws.end());
+
+    for(int i = straws.size() - 1; i >= 2; i--) {
+        int a = straws[i - 2];
+        int b = straws[i - 1];
+        int c = straws[i];
+
+        if(c < a + b) {
+            return a + b + c;
+        }
     }
-    return result;
+    return -1;
 }
 
 int main() {
     int n;
+    vector<int> straws;
+
     cin >> n;
 
-    vector<int> straw(n, 0);
-    for(int i = 0; i < n; i++)
-        cin >> straw[i];
-    sort(straw.begin(), straw.end());
+    straws.assign(n, 0);
+    for(int i = 0; i < n; i++) {
+        cin >> straws[i];
+    }
 
-    cout << triangle(n, straw);
+    cout << solution(straws);
     return 0;
 }
