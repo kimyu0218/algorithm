@@ -3,29 +3,42 @@
 
 using namespace std;
 
-vector<pair<int, int>> consult; // (first: time, second : profit)
-vector<int> dp;
+typedef pair<int, int> pi;
 
-int max_profit(int n) {
-    for(int i = 1; i <= n; i++) { // (i : 일자)
-        dp[i] = max(dp[i], dp[i-1]);
-        int restart_date = i + consult[i].first; // 다시 상담을 진행할 수 있는 날짜
-        if(restart_date <= n+1) dp[restart_date] = max(dp[restart_date], dp[i] + consult[i].second); // 상담 진행
+int solution(vector<pi> schedule) {
+    int n = schedule.size();
+    vector<int> dp(n + 1, 0);
+
+    int t = schedule[0].first;
+    int p = schedule[0].second;
+    if(t <= n) {
+        dp[t] = p;
     }
 
-    dp[n+1] = max(dp[n], dp[n+1]);
-    return dp[n+1];
+    for(int i = 0; i < n; i++) {
+        dp[i] = max(dp[i], dp[i - 1]);
+
+        int t = schedule[i].first;
+        int p = schedule[i].second;
+        if(i + t > n) {
+            continue;
+        }
+        dp[i + t] = max(dp[i + t], dp[i] + p);
+    }
+    return max(dp[n], dp[n - 1]);
 }
 
 int main() {
     int n;
+    vector<pi> schedule;
+
     cin >> n;
 
-    dp.assign(n+2, 0);
-    consult.assign(n+2, {1, 0});
-    for(int i = 1; i <= n; i++)
-        cin >> consult[i].first >> consult[i].second;
+    schedule.assign(n, {0, 0});
+    for(int i = 0; i < n; i++) {
+        cin >> schedule[i].first >> schedule[i].second;
+    }
 
-    cout << max_profit(n);
+    cout << solution(schedule);
     return 0;
 }

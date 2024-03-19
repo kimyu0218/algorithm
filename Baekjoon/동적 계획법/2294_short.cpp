@@ -1,34 +1,39 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
-vector<int> coin, dp; // dp[k원] = 최소 동전수
+const int INF = 1e9 + 1;
 
-int min_cnt(int n, int k) {
-    dp[0] = 0;
-    for(int i = 0; i < n; i++) { // n개의 동전
-        // coin[i] : 동전 금액
-        for(int j = coin[i]; j <= k; j++) {
-            if(dp[j-coin[i]] == -1) continue; // j원을 만들 수 없는 경우 pass
-            if(dp[j] == -1) dp[j] = dp[j-coin[i]] + 1; // 1. 이전에 j원을 만들지 못한 경우
-            else dp[j] = min(dp[j], dp[j-coin[i]] + 1); // 2. 이전에 j원을 만든 이력이 있는 경우 최솟값 선택
+int solution(int n, int k, vector<int> coin) {
+    vector<int> dp(k + 1, INF);
+
+    for(int i = 0; i < n; i++) {
+        int v = coin[i];
+        dp[v] = 1;
+
+        for(int j = v + 1; j <= k; j++) {
+            int u = dp[j - v];
+            if(u == INF) {
+                continue;
+            }
+            dp[j] = min(dp[j], u + dp[v]);
         }
     }
-    return dp[k];
+    return dp[k] == INF ? -1 : dp[k];
 }
 
 int main() {
     int n, k;
+    vector<int> coin;
+
     cin >> n >> k;
 
-    dp.assign(k+1, -1);
     coin.assign(n, 0);
-    for(int i = 0; i < n; i++) // 동전 가치 입력
+    for(int i = 0; i < n; i++) {
         cin >> coin[i];
-    sort(coin.begin(), coin.end());
+    }
 
-    cout << min_cnt(n, k);
+    cout << solution(n, k, coin);
     return 0;
 }

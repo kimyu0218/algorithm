@@ -1,28 +1,38 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-const int SIZE = 100, DENOMINATOR = 1000000000;
-int dp[SIZE+1][10];
+const int SIZE = 10;
+const int MOD = 1e9;
 
-int stair_num(int n) {
-    for(int i = 1; i <= 9; i++) dp[1][i] = 1; // 첫번째 자리수 세팅 (0은 포함하지 않는다)
+int solution(int n) {
+    int result = 0;
+    vector<vector<int>> dp(n, vector<int> (SIZE, 0));
 
-    for(int i = 2; i <= n; i++) { // (i : 자릿수)
-        dp[i][0] = dp[i-1][1] % DENOMINATOR; // (0과 계단 수를 이룰 수 있는 건 1뿐)
-        for(int j = 1; j <= 8; j++) dp[i][j] = (dp[i-1][j-1] + dp[i-1][j+1]) % DENOMINATOR;
-        dp[i][9] = dp[i-1][8] % DENOMINATOR; // (9와 계단 수를 이룰 수 있는 건 8뿐)
+    for(int i = 1; i < SIZE; i++) {
+        dp[0][i] = 1;
     }
 
-    long long result = 0;
-    for(int i = 0; i <= 9; i++) result += dp[n][i];
-    return result % DENOMINATOR;
+    for(int i = 1; i < n; i++) {
+        dp[i][0] = dp[i - 1][1];
+        for(int j = 1; j <= 8; j++) {
+            dp[i][j] = (dp[i - 1][j- 1] + dp[i - 1][j + 1]) % MOD;
+        }
+        dp[i][9] = dp[i-1][8];
+    }
+
+    for(int i = 0; i < SIZE; i++) {
+        result = (result + dp[n - 1][i]) % MOD;
+    }
+    return result;
 }
 
 int main() {
     int n;
+
     cin >> n;
 
-    cout << stair_num(n);
+    cout << solution(n);
     return 0;
 }

@@ -1,26 +1,38 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-const int SIZE = 100, MAX = 100000;
-int w[SIZE+1], v[SIZE+1], dp[MAX+1]; // (dp[무게] = 최대 가치합)
+typedef pair<int, int> pi;
 
-int max_value(int n, int k) { // 가치 최대합 계산
-    for(int i = 1; i <= n; i++) { // (i : 물품 번호, j : 배낭 무게)
-        // 1. dp[j] : 이전 최대 가치합
-        // 2. dp[j-w[i]] + v[i] : 현재 물건 넣기
-        for(int j = k; j >= w[i]; j--) dp[j] = max(dp[j], dp[j-w[i]] + v[i]);
+int solution(int n, int k, vector<pi> items) {
+    vector<int> dp(k + 1, 0);
+
+    for(int i = 0; i < n; i++) {
+        int w = items[i].first;
+        int v = items[i].second;
+
+        if(w > k) {
+            continue;
+        }
+        for(int j = k; j >= w; j--) {
+            dp[j] = max(dp[j], dp[j - w] + v);
+        }
     }
     return dp[k];
 }
 
 int main() {
     int n, k;
+    vector<pi> items;
+
     cin >> n >> k;
 
-    for(int i = 1; i <= n; i++) // 무게, 가치 입력
-        cin >> w[i] >> v[i];
+    items.assign(n, {0, 0});
+    for(int i = 0; i < n; i++) {
+        cin >> items[i].first >> items[i].second;
+    }
 
-    cout << max_value(n, k);
+    cout << solution(n, k, items);
     return 0;
 }

@@ -4,35 +4,39 @@
 
 using namespace std;
 
-vector<int> dp;
-vector<pair<int, int>> pole;
+typedef pair<int, int> pi;
 
-int lis(int n) { // LIS 구하기
-    for(int i = 1; i <= n; i++) {
-        dp[i] = 1; // 초기값 1로 세팅
+int solution(vector<pi> ab) {
+    int n = ab.size();
+    vector<int> dp(n + 1, 1);
+
+    sort(ab.begin(), ab.end());
+
+    for(int i = 1; i < n; i++) {
+        int b = ab[i].second;
+
         for(int j = 0; j < i; j++) {
-            if(pole[i].second > pole[j].second) // 증가 수열인 경우
-                dp[i] = max(dp[i], dp[j]+1);
+            if(b > ab[j].second) {
+                dp[i] = max(dp[i], dp[j] + 1);
+            }
         }
-    }
 
-    int length = 0;
-    for(int i = 1; i <= n; i++) {
-        if(dp[i] > length) length = dp[i];
+        dp[n] = max(dp[n], dp[i]);
     }
-    return n - length;
+    return n - dp[n];
 }
 
 int main() {
-    int n, start, end;
+    int n;
+    vector<pi> ab;
+
     cin >> n;
 
-    dp.assign(n+1, 0);
-    pole.assign(n+1, {0, 0});
-    for(int i = 1; i <= n; i++)
-        cin >> pole[i].first >> pole[i].second;
-    sort(pole.begin(), pole.end());
+    ab.assign(n, {0, 0});
+    for(int i = 0; i < n; i++) {
+        cin >> ab[i].first >> ab[i].second;
+    }
 
-    cout << lis(n);
+    cout << solution(ab);
     return 0;
 }

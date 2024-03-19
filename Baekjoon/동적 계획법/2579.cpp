@@ -1,26 +1,38 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-const int MAX = 300;
-int stair[MAX], dp[MAX];
+int solution(int n, vector<int> stairs) {
+    if(n == 1) {
+        return stairs[0];
+    }
+    if(n == 2) {
+        return stairs[0] + stairs[1];
+    }
 
-int step_up(int n) {
-    dp[0] = stair[0]; dp[1] = stair[0] + stair[1];
-    // 1. 두 칸 올라가기
-    // 2. 한 칸 이동 (i-2 건너뛰기)
-    for(int i = 2; i < n; i++)
-        dp[i] = max(dp[i-2], dp[i-3] + stair[i-1]) + stair[i];
-    return dp[n-1];
+    vector<int> dp(n, 0);
+    dp[0] = stairs[0];
+    dp[1] = stairs[0] + stairs[1];
+    dp[2] = max(stairs[0] + stairs[2], stairs[1] + stairs[2]);
+
+    for(int i = 3; i < n; i++) {
+        dp[i] = max(dp[i - 2], dp[i - 3] + stairs[i - 1]) + stairs[i];
+    }
+    return dp[n - 1];
 }
 
 int main() {
     int n;
+    vector<int> stairs;
+
     cin >> n;
 
-    for(int i = 0; i < n; i++) // 계단 점수 입력
-        cin >> stair[i];
+    stairs.assign(n, 0);
+    for(int i = 0; i < n; i++) {
+        cin >> stairs[i];
+    }
 
-    cout << step_up(n);
+    cout << solution(n, stairs);
     return 0;
 }

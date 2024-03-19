@@ -1,37 +1,59 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
-const int SIZE = 1000, MAX = 1000000;
-int cost[SIZE+1][3], dp[SIZE+1][3];
 
-int min_cost(int n, int color) {
-    for(int i = 2; i <= n; i++) {
-        dp[i][0] = min(dp[i-1][1], dp[i-1][2]) + cost[i][0];
-        dp[i][1] = min(dp[i-1][0], dp[i-1][2]) + cost[i][1];
-        dp[i][2] = min(dp[i-1][0], dp[i-1][1]) + cost[i][2];
+typedef pair<int, int> pi;
+
+const int COLOR = 3;
+const int INF = 1e6 + 1;
+
+int min_cost(int color, vector<vector<int>> houses) {
+    int result = INF;
+    int n = houses.size();
+    vector<vector<int>> dp(n, vector<int> (COLOR, 0));
+
+    for(int i = 0; i < COLOR; i++) {
+        dp[0][i] = (i == color) ? houses[0][i] : INF;
     }
 
-    int result = MAX + 1;
-    for(int i = 0; i < 3; i++) { // i : 집 색상
-        if(i != color) result = min(result, dp[n][i]); // 첫번째 집 색상과 n번째 집 색상이 다른 경우
+    for(int i = 1; i < n; i++) {
+        for(int j = 0; j < COLOR; j++) {
+            dp[i][j] = min(dp[i - 1][(j + 1 + COLOR) % COLOR], dp[i - 1][(j + 2 + COLOR) % COLOR]) + houses[i][j];
+        }
+    }
+
+    for(int i = 0; i < COLOR; i++) {
+        if(i == color) {
+            continue;
+        }
+        result = min(result, dp[n - 1][i]);
+    }
+    return result;
+}
+
+int solution(vector<vector<int>> houses) {
+    int result = INF;
+
+    for(int i = 0; i < COLOR; i++) {
+        result = min(result, min_cost(i, houses));
     }
     return result;
 }
 
 int main() {
-    int n, result = MAX+1;
+    int n;
+    vector<vector<int>> houses;
+
     cin >> n;
 
-    for(int i = 1; i <= n; i++)
-        cin >> cost[i][0] >> cost[i][1] >> cost[i][2];
-
-    for(int i = 0; i < 3; i++) { // i : 집 색상
-        for(int j = 0; j < 3; j++) {
-            if(i == j) dp[1][j] = cost[1][j];
-            else dp[1][j] = MAX + 1;
+    houses.assign(n, vector<int> (COLOR, 0));
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < COLOR; j++) {
+            cin >> houses[i][j];
         }
-        result = min(result, min_cost(n, i)); // 첫번째 집이 i 색상일 때 최솟값
     }
-    cout << result;
+
+    cout << solution(houses);
     return 0;
 }
