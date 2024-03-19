@@ -17,9 +17,9 @@ int solution(int n) {
     for(int i = 1; i < n; i++) {
         dp[i][0] = dp[i - 1][1];
         for(int j = 1; j <= 8; j++) {
-            dp[i][j] = (dp[i - 1][j- 1] + dp[i - 1][j + 1]) % MOD;
+            dp[i][j] = (dp[i - 1][j - 1] + dp[i - 1][j + 1]) % MOD;
         }
-        dp[i][9] = dp[i-1][8];
+        dp[i][9] = dp[i - 1][8];
     }
 
     for(int i = 0; i < SIZE; i++) {

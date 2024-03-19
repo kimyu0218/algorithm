@@ -20,10 +20,11 @@ int solution(vector<pi> schedule) {
 
         int t = schedule[i].first;
         int p = schedule[i].second;
-        if(i + t > n) {
+        int next = i + t;
+        if(next > n) {
             continue;
         }
-        dp[i + t] = max(dp[i + t], dp[i] + p);
+        dp[next] = max(dp[next], dp[i] + p);
     }
     return max(dp[n], dp[n - 1]);
 }

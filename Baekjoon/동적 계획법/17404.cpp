@@ -19,7 +19,9 @@ int min_cost(int color, vector<vector<int>> houses) {
 
     for(int i = 1; i < n; i++) {
         for(int j = 0; j < COLOR; j++) {
-            dp[i][j] = min(dp[i - 1][(j + 1 + COLOR) % COLOR], dp[i - 1][(j + 2 + COLOR) % COLOR]) + houses[i][j];
+            int diff_color1 = (j + 1 + COLOR) % COLOR;
+            int diff_color2 = (j + 2 + COLOR) % COLOR;
+            dp[i][j] = min(dp[i - 1][diff_color1], dp[i - 1][diff_color2]) + houses[i][j];
         }
     }
 
