@@ -2,39 +2,50 @@
 
 using namespace std;
 
-const int N = 10, MAX = 1000000;
-int n, start_pos;
-int result = N * N * MAX + 1;
-bool check[N+1] = { false, }; // 순회 여부 저장하는 배열
-int way[N+1][N+1]; // 비용 정보 저장하는 배열
+const int MAX = 10;
 
-void backtracking(int prev, int cnt, int weight) {
-    if(cnt == n) { // n개 도시 순회 완료
-        if(way[prev][start_pos] == 0) return; // 이동할 수 없는 경우 pass
-        weight += way[prev][start_pos]; // 원점으로 돌아오기
-        result = min(result, weight); return;
+int result = 1e6 * MAX + 1;
+int w[MAX][MAX];
+bool visited[MAX];
+
+void backtracking(int start, int prev, int cost, int cnt, int n) {
+    if(cnt == n) {
+        if(!w[prev][start]) {
+            return;
+        }
+        result = min(result, cost + w[prev][start]);
+        return;
     }
+
     for(int i = 0; i < n; i++) {
-        if(check[i] || way[prev][i] == 0) continue; // 방문한 도시나 이동할 수 없는 경우 pass
-        check[i] = true;
-        backtracking(i, cnt+1, weight + way[prev][i]);
-        check[i] = false;
+        if(!w[prev][i] || visited[i]) {
+            continue;
+        }
+        visited[i] = true;
+        backtracking(start, i, cost + w[prev][i], cnt + 1, n);
+        visited[i] = false;
     }
 }
 
+int solution(int n) {
+    for(int i = 0; i < n; i++) {
+        visited[i] = true;
+        backtracking(i, i, 0, 1, n);
+        visited[i] = false;
+    }
+    return result;
+}
+
 int main() {
+    int n;
+
     cin >> n;
-
     for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++)
-            cin >> way[i][j];
+        for(int j = 0; j < n; j++) {
+            cin >> w[i][j];
+        }
     }
 
-    for(int i = 0; i < n; i++) {
-        start_pos = i; check[i] = true; // 시작점 방문 완료
-        backtracking(i, 1, 0);
-        check[i] = false;
-    }
-    cout << result;
+    cout << solution(n);
     return 0;
 }

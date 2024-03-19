@@ -3,27 +3,35 @@
 using namespace std;
 
 const int MAX = 8;
-int n, m;
-bool check[MAX+1] = { false, }; // 사용 여부 저장하는 배열
-int arr[MAX]; // 수열 저장하는 배열
 
-void backtracking(int cnt) {
-    if(cnt == m) { // 수열 길이가 m인 경우 수열 출력
-        for(int i = 0; i < cnt; i++)
-            cout << arr[i] << ' ';
+bool visited[MAX];
+int result[MAX];
+
+void solution(int idx, int n, int m) {
+    if(idx == m) {
+        for(int i = 0; i < m; i++) {
+            cout << result[i] << ' ';
+        }
         cout << '\n';
+        return;
     }
+
     for(int i = 1; i <= n; i++) {
-        if(check[i]) continue; // 이미 사용한 수 pass
-        arr[cnt] = i; check[i] = true;
-        backtracking(cnt+1);
-        check[i] = false;
+        if(visited[i]) {
+            continue;
+        }
+        visited[i] = true;
+        result[idx] = i;
+        solution(idx + 1, n, m);
+        visited[i] = false;
     }
 }
 
 int main() {
+    int n, m;
+
     cin >> n >> m;
 
-    backtracking(0);
+    solution(0, n, m);
     return 0;
 }

@@ -4,33 +4,34 @@
 using namespace std;
 
 const int MAX = 7;
-int n, m;
-int arr[MAX+1]; // 수열 저장히는 배열
+
+int result[MAX];
 set<int> s;
 
-void backtracking(int cnt) {
-    if(cnt == m) {
-        for(int i = 0; i < cnt; i++)
-            cout << arr[i] << ' ';
+void solution(int idx, int n, int m) {
+    if(idx == m) {
+        for(int i = 0; i < m; i++) {
+            cout << result[i] << ' ';
+        }
         cout << '\n';
         return;
     }
 
     for(auto iter = s.begin(); iter != s.end(); iter++) {
-        arr[cnt] = *iter; // 수열에 넣기
-        backtracking(cnt+1);
+        result[idx] = *iter;
+        solution(idx + 1, n, m);
     }
 }
 
 int main() {
-    cin >> n >> m;
+    int n, m, num;
 
-    int num;
-    for(int i = 0; i < n; i++) {// 수 입력받기
+    cin >> n >> m;
+    for(int i = 0; i < n; i++) {
         cin >> num;
         s.insert(num);
     }
 
-    backtracking(0);
+    solution(0, n, m);
     return 0;
 }

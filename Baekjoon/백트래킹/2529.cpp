@@ -3,39 +3,49 @@
 
 using namespace std;
 
-int k;
-int arr[10]; // 수열 저장하는 배열
-bool check[10] = { false, }; // 사용 여부 저장하는 배열
-vector<char> op; // 부등호 저장하는 배열
-vector<string> result;
+const int MAX = 10;
 
-void backtracking(int cnt, int start, int end) { // (start, end : 탐색 범위)
-    if(cnt == k+1) { // k+1 문자열 완성
-        string temp = "";
-        for(int i = 0; i < cnt; i++)
-            temp += to_string(arr[i]);
-        result.push_back(temp);
+vector<string> v;
+bool visited[MAX];
+char ch[MAX - 1];
+
+void backtracking(int idx, int k, int start, int end, string result) {
+    if(idx == k + 1) {
+        v.push_back(result);
         return;
     }
 
-    for(int i = start; i <= end; i++) {
-        if(check[i]) continue; // 이미 사용된 숫자 pass
-        arr[cnt] = i; check[i] = true;
-        if(op[cnt] == '<') backtracking(cnt+1, i+1, 9); // 부등호가 < 인 경우 : 현재값보다 큰 수부터 탐색
-        else backtracking(cnt+1, 0, i-1); // 부등호가 > 인 경우 : 현재값보다 작은 수까지 탐색
-        check[i] = false;
+    for(int i = start; i < end; i++) {
+        if(visited[i]) {
+            continue;
+        }
+        visited[i] = true;
+        string new_result = result + to_string(i);
+        if(ch[idx] == '<') {
+            backtracking(idx + 1, k, i + 1, MAX, new_result);
+        }
+        else {
+            backtracking(idx + 1, k, 0, i, new_result);
+        }
+        visited[i] = false;
     }
 }
 
+vector<string> solution(int k) {
+    backtracking(0, k, 0, MAX, "");
+    return { v[v.size() - 1], v[0]};
+}
+
 int main() {
+    int k;
+
     cin >> k;
+    for(int i = 0; i < k; i++) {
+        cin >> ch[i];
+    }
 
-    op.assign(k, '\0');
-    for(int i = 0; i < k; i++) // 부등호 입력
-        cin >> op[i];
+    vector<string> answer = solution(k);
 
-    backtracking(0,0,9);
-    cout << result[result.size()-1] << '\n';
-    cout << result[0];
+    cout << answer[0] << '\n' << answer[1];
     return 0;
 }
