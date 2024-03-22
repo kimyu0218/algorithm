@@ -4,54 +4,61 @@
 
 using namespace std;
 
-typedef pair<int, int> ci;
-const int INF = 1e5 * 2;
-vector<vector<ci>> graph;
+typedef pair<int, int> pi;
 
-vector<int> dijkstra(int v, int k) {
-    vector<int> dist (v+1, INF); // k에서 모든 정점들까지의 가중치
-    // (거리 짧은 곳부터 탐색)
-    priority_queue<ci, vector<ci>, greater<>> pq; // (first: 가중치, second: 정점)
+const int INF = 2 * 1e5;
 
-    // 시작 정점 초기화
-    dist[k] = 0;
-    pq.push({0, k});
+vector<int> dijkstra(int v, int k, vector<vector<pi>> adj_list) {
+    vector<int> dist(v, INF);
+    priority_queue<pi, vector<pi>, greater<>> pq;
+
+    dist[k - 1] = 0;
+    pq.push({0, k - 1});
 
     while(!pq.empty()) {
-        int weight = pq.top().first;
         int node = pq.top().second;
         pq.pop();
 
-        if(weight > dist[node]) continue; // 이미 확인한 노드 pass
-        // 시작 정점에서 node를 거쳐 next_node로 가보자
-        for(int i = 0; i < graph[node].size(); i++) {
-            int next_node = graph[node][i].first;
-            int next_weight = weight + graph[node][i].second;
+        for(int i = 0; i < adj_list[node].size(); i++) {
+            int next = adj_list[node][i].first;
+            int w = adj_list[node][i].second;
 
-            if(dist[next_node] > next_weight) { // node를 거치는 게 좀 더 작은 가중치를 가지는 경우
-                dist[next_node] = next_weight;
-                pq.push({next_weight, next_node});
+            if(dist[next] > dist[node] + w) {
+                dist[next] = dist[node] + w;
+                pq.push({dist[next], next});
             }
         }
     }
     return dist;
 }
 
-int main() {
-    int vertex, edge, k, u, v, w;
-    cin >> vertex >> edge >> k;
-    graph.assign(vertex + 1, vector<ci> (0));
+vector<string> solution(int k, vector<vector<pi>> adj_list) {
+    int v = adj_list.size();
+    vector<string> result(v, "");
+    vector<int> dist = dijkstra(v, k, adj_list);
 
-    while(edge--) {
-        cin >> u >> v >> w;
-        // (방향 그래프)
-        graph[u].push_back({v, w}); // (u에서 v로 가는 가중치 w 간선 존재)
+    for(int i = 0; i < v; i++) {
+        result[i] = (dist[i] == INF ? "INF" : to_string(dist[i]));
+    }
+    return result;
+}
+
+int main() {
+    int v, e, k, eu, ev, ew;
+    vector<vector<pi>> adj_list;
+
+    cin >> v >> e >> k;
+
+    adj_list.assign(v, vector<pi> (0));
+    while(e--) {
+        cin >> eu >> ev >> ew;
+        adj_list[eu - 1].push_back({ev - 1, ew});
     }
 
-    vector<int> dist = dijkstra(vertex, k);
-    for(int i = 1; i <= vertex; i++) {
-        if(dist[i] == INF) cout << "INF\n";
-        else cout << dist[i] << '\n';
+    vector<string> result = solution(k, adj_list);
+
+    for(int i = 0; i < v; i++) {
+        cout << result[i] << '\n';
     }
     return 0;
 }

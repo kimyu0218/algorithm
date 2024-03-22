@@ -4,55 +4,64 @@
 
 using namespace std;
 
-typedef pair<int, int> ci;
-const int INF = 1e6;
-vector<vector<ci>> graph, rev_graph; // 순방향 그래프, 역방향 그래프
+typedef pair<int, int> pi;
 
-vector<int> dijkstra(int start, int n, vector<vector<ci>> g) {
-    vector<int> dist(n+1, INF);
-    priority_queue<ci, vector<ci>, greater<>> pq;
+const int INF = 1e5;
 
-    // 시작 지점 초기화
-    dist[start] = 0; pq.push({0, start});
+vector<int> dijkstra(int x, int n, vector<vector<pi>> adj_list) {
+    vector<int> dist(n, INF);
+    priority_queue<pi, vector<pi>, greater<>> pq;
+
+    dist[x - 1] = 0;
+    pq.push({0, x - 1});
 
     while(!pq.empty()) {
-        int weight = pq.top().first;
         int node = pq.top().second;
         pq.pop();
 
-        if(weight > dist[node]) continue; // 이미 방문한 노드 pass
+        for(int i = 0; i < adj_list[node].size(); i++) {
+            int next = adj_list[node][i].first;
+            int w = adj_list[node][i].second;
 
-        for(int i = 0; i < g[node].size(); i++) {
-            int new_node = g[node][i].first;
-            int new_weight = weight + g[node][i].second;
-            if(dist[new_node] > new_weight) { // 더 짧은 경로 발견
-                dist[new_node] = new_weight;
-                pq.push({new_weight, new_node});
+            if(dist[next] > dist[node] + w) {
+                dist[next] = dist[node] + w;
+                pq.push({dist[next], next});
             }
         }
     }
     return dist;
 }
 
+int solution(int x, vector<vector<pi>> adj_list, vector<vector<pi>> rev_adj_list) {
+    int result = 0;
+    int n = adj_list.size();
+
+    vector<int> to_x = dijkstra(x, n, rev_adj_list);
+    vector<int> from_x = dijkstra(x, n, adj_list);
+
+    for(int i = 0; i < n; i++) {
+        result = max(result, to_x[i] + from_x[i]);
+    }
+    return result;
+}
+
 int main() {
-    int n, m, x, u, v, w;
+    int n, m, x, s, e, t;
+    vector<vector<pi>> adj_list;
+    vector<vector<pi>> rev_adj_list;
+
     cin >> n >> m >> x;
 
-    graph.assign(n+1, vector<ci> (0));
-    rev_graph.assign(n+1, vector<ci> (0));
-    while(m--) { // m개의 간선
-        cin >> u >> v >> w;
-        // u에서 v로 가는 가중치 w
-        graph[u].push_back({v, w});
-        rev_graph[v].push_back({u, w});
+    adj_list.assign(n, vector<pi>(0));
+    rev_adj_list.assign(n, vector<pi>(0));
+
+    while(m--) {
+        cin >> s >> e >> t;
+
+        adj_list[s - 1].push_back({e - 1, t});
+        rev_adj_list[e - 1].push_back({s - 1, t});
     }
 
-    vector<int> go_dist = dijkstra(x, n, rev_graph); // 모든 정점에서 x로 가는 최단 경로
-    vector<int> back_dist = dijkstra(x, n, graph); // x에서 모든 정점까지 가는 최단 경로
-
-    int time = 0;
-    for(int i = 1; i <= n; i++)
-        time = max(time, go_dist[i] + back_dist[i]);
-    cout << time;
+    cout << solution(x, adj_list, rev_adj_list);
     return 0;
 }
