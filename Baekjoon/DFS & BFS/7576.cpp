@@ -4,52 +4,93 @@
 
 using namespace std;
 
-vector<vector<int>> tomato;
-queue<pair<int, int>> q; // 익은 토마토 저장하는 큐
+typedef pair<int, int> pi;
 
-int bfs(int m, int n, int cnt) {
-    int date = 0;
-    // 상하좌우
-    int dx[4] = { 0, 0, -1, 1 };
-    int dy[4] = { -1, 1, 0, 0 };
+const int RED = 1;
+const int GREEN = 0;
+const int NONE = -1;
 
-    while(!q.empty()) {
-        // 익은 토마토
-        int row = q.front().first;
-        int col = q.front().second;
-        date = tomato[row][col];
-        q.pop();
+struct tomato {
+    int r, c, day;
+};
 
-        // 인접한 토마토에 영향 미치기
-        for(int i = 0; i < 4; i++) {
-            int new_row = row + dy[i];
-            int new_col = col + dx[i];
-            if(new_row >= 0 && new_row < n && new_col >= 0 && new_col < m && !tomato[new_row][new_col]) {
-                tomato[new_row][new_col] = date + 1;
-                cnt--;
-                q.push({new_row, new_col});
-            }
+int cnt_tomatoes(int n, int m, vector<vector<int>> tomatoes) {
+    int result = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            result += (tomatoes[i][j] != NONE);
         }
     }
-    // 1. 토마토가 다 익은 경우
-    if(!cnt) return date - 1; // (처음부터 익어있던 토마토는 0일만에 익는데 1일부터 시작했으므로 -1을 해야 함)
-    // 2. 익지 않은 토마토가 남아있는 경우
-    return -1;
+    return result;
+}
+
+bool is_valid_pos(int row, int col, int n, int m) {
+    return row >= 0 && row < n && col >= 0 && col < m;
+}
+
+pi bfs(int n, int m, vector<vector<int>> tomatoes) {
+    int t_cnt = 0;
+    int d_cnt = 0;
+    queue<tomato> q;
+
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(tomatoes[i][j] != RED) {
+                continue;
+            }
+            q.push({i, j, 0});
+        }
+    }
+
+    int dr[4] = {-1, 1, 0, 0};
+    int dc[4] = {0, 0, -1, 1};
+
+    while(!q.empty()) {
+        int r = q.front().r;
+        int c = q.front().c;
+        int day = q.front().day;
+        q.pop();
+
+        d_cnt = day;
+        t_cnt++;
+
+        for(int i = 0; i < 4; i++) {
+            int nr = r + dr[i];
+            int nc = c + dc[i];
+
+            if(!is_valid_pos(nr, nc, n, m) || tomatoes[nr][nc] != GREEN) {
+                continue;
+            }
+            tomatoes[nr][nc] = RED;
+            q.push({nr, nc, day + 1});
+        }
+    }
+    return {t_cnt, d_cnt};
+}
+
+int solution(vector<vector<int>> tomatoes) {
+    int n = tomatoes.size();
+    int m = tomatoes[0].size();
+
+    int t_cnt = cnt_tomatoes(n, m, tomatoes);
+    pi result = bfs(n, m, tomatoes);
+
+    return (t_cnt == result.first) ? result.second : -1;
 }
 
 int main() {
-    int m, n, cnt = 0; // (cnt : 안 익은 토마토 개수)
+    int m, n;
+    vector<vector<int>> tomatoes;
+
     cin >> m >> n;
 
-    tomato.assign(n, vector<int> (m, 0));
-    for(int i = 0; i < n; i++) { // 토마토 정보 입력
+    tomatoes.assign(n, vector<int> (m, 0));
+    for(int i = 0; i < n; i++) {
         for(int j = 0; j < m; j++) {
-            cin >> tomato[i][j];
-            if(tomato[i][j] == 1) q.push({i, j}); // 1. 익은 토마토
-            else if(tomato[i][j] == 0) cnt++; // 2. 익지 않은 토마토 개수 세기
+            cin >> tomatoes[i][j];
         }
     }
 
-    cout << bfs(m, n, cnt);
+    cout << solution(tomatoes);
     return 0;
 }

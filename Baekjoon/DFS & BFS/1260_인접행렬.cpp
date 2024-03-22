@@ -5,73 +5,72 @@
 
 using namespace std;
 
-vector<vector<bool>> edge;
+void dfs(int n, int v, vector<vector<int>> adj_matrix) {
+    vector<bool> visited(n, false);
+    stack<int> s;
 
-vector<int> dfs(int v, int n) {
-    vector<int> result;
-
-    vector<bool> visited (n+1, false); // 노드 방문 여부 체크
-    stack<int> s; // (dfs : 스택 이용)
-
-    visited[v] = true; s.push(v); // 시작 노드 방문
-    result.push_back(v);
+    s.push(v - 1);
 
     while(!s.empty()) {
         int node = s.top();
+        s.pop();
 
-        bool find = false;
-        for(int i = 1; i <= n; i++) {
-            // 아직 방문하지 않은 노드 && node와 연결된 정점인 경우
-            if(!visited[i] && edge[node][i]) {
-                visited[i] = true; s.push(i);
-                result.push_back(i);
-                find = true; break; // 1. 더 깊게 탐색 -> 더 이상 node와 연결된 정점 찾을 필요 없음
-            }
+        if(visited[node]) {
+            continue;
         }
-        // 2. 더 깊게 탐색 불가 -> 이전 node로 돌아가기
-        if(!find) s.pop();
+        visited[node] = true;
+        cout << node + 1 << ' ';
+
+        for(int i = n - 1; i >= 0; i--) {
+            if(visited[i] || !adj_matrix[node][i]) {
+                continue;
+            }
+            s.push(i);
+        }
     }
-    return result;
 }
 
-vector<int> bfs(int v, int n) {
-    vector<int> result;
+void bfs(int n, int v, vector<vector<int>> adj_matrix) {
+    vector<bool> visited(n, false);
+    queue<int> q;
 
-    vector<bool> visited (n+1, false); // 노드 방문 여부 체크
-    queue<int> q; // (bfs : 큐 이용)
+    q.push(v - 1);
+    visited[v - 1] = true;
 
-    visited[v] = true; q.push(v); // 시작 노드 방문
     while(!q.empty()) {
-        int node = q.front(); q.pop();
-        result.push_back(node);
-        for(int i = 1; i <= n; i++) {
-            if(!visited[i] && edge[node][i]) {
-                visited[i] = true; q.push(i);
+        int node = q.front();
+        q.pop();
+
+        cout << node + 1 << ' ';
+
+        for(int i = 0; i < n; i++) {
+            if(visited[i] || !adj_matrix[node][i]) {
+                continue;
             }
+            visited[i] = true;
+            q.push(i);
         }
     }
-    return result;
+}
+
+void solution(int n, int v, vector<vector<int>> adj_matrix) {
+    dfs(n, v, adj_matrix);
+    cout << '\n';
+    bfs(n, v, adj_matrix);
 }
 
 int main() {
-    int n, m, v; // 정점 개수, 간선 개수
+    int n, m, v, a, b;
+    vector<vector<int>> adj_matrix;
+
     cin >> n >> m >> v;
 
-    edge.assign(n+1, vector<bool>(n+1, false));
-
-    int n1, n2;
-    while(m--) { // 간선 정보 입력
-        cin >> n1 >> n2;
-        // 양방향
-        edge[n1][n2] = true;
-        edge[n2][n1] = true;
+    adj_matrix.assign(n, vector<int> (n, 0));
+    for(int i = 0; i < m; i++) {
+        cin >> a >> b;
+        adj_matrix[a - 1][b - 1] = adj_matrix[b - 1][a - 1] = true;
     }
 
-    vector<int> dfs_result = dfs(v, n);
-    vector<int> bfs_result = bfs(v, n);
-
-    for(int i = 0; i < dfs_result.size(); i++) cout << dfs_result[i] << ' ';
-    cout << '\n';
-    for(int i = 0; i < bfs_result.size(); i++) cout << bfs_result[i] << ' ';
+    solution(n, v, adj_matrix);
     return 0;
 }
