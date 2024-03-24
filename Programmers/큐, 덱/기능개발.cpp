@@ -7,22 +7,30 @@ using namespace std;
 vector<int> solution(vector<int> progresses, vector<int> speeds) {
     vector<int> answer;
 
-    int cnt = progresses.size(); // 작업 개수
-    vector<int> date(cnt, 0); // 남은 작업량을 개발하는 데 걸리는 시간
-    for(int i = 0; i < cnt; i++) {
-        int remain = 100 - progresses[i]; // 남은 작업량
-        date[i] = remain / speeds[i];
-        if(remain % speeds[i]) date[i]++;
+    int n = progresses.size();
+
+    vector<int> day(n, 0);
+    for(int i = 0; i < n; i++) {
+        int remain = 100 - progresses[i];
+        day[i] = (remain / speeds[i]) + (remain % speeds[i] > 0);
     }
 
-    queue<int> q; // front가 가장 큰 수 가리킴
-    for(int i = 0; i < cnt; i++) {
-        if(!q.empty() && date[i] > q.front()) {
-            answer.push_back(q.size()); // i-1까지만 같이 배포
-            while(!q.empty()) q.pop();
+    int idx = 0;
+    queue<int> q;
+    q.push(day[idx++]);
+
+    while(idx < n) {
+        int deploy_date = q.front();
+
+        if(day[idx] > deploy_date) {
+            answer.push_back(q.size());
+            while(!q.empty()) {
+                q.pop();
+            }
         }
-        q.push(date[i]);
+        q.push(day[idx++]);
     }
-    if(!q.empty()) answer.push_back(q.size());
+
+    answer.push_back(q.size());
     return answer;
 }
