@@ -4,42 +4,43 @@
 
 using namespace std;
 
-bool can_change(string prev, string next, int len) { // 단어 변환 가능 여부 반환
-    int diff = 0;
-    for(int i = 0; i < len; i++) {
-        if(prev[i] != next[i]) diff++;
+struct info {
+    string s;
+    int step;
+};
+
+int cnt_diff(string s1, string s2) {
+    int result = 0;
+    for(int i = 0; i < s1.length(); i++) {
+        result += (s1[i] != s2[i]);
     }
-    return (diff == 1);
+    return result;
 }
 
 int solution(string begin, string target, vector<string> words) {
-    int size = words.size(), len = words[0].length(); // 단어 개수, 단어 길이
-    vector<int> step(size, 0); // 단계 저장
-    vector<bool> visited(size, false); // 방문 여부 저장
-    queue<int> q;
+    int answer = 0;
 
-    for(int i = 0; i < size; i++) { // begin에서 words[i]로 변환 가능한 단어 찾기
-        if(can_change(begin, words[i], len)) {
-            visited[i] = true;
-            step[i] = 1;
-            q.push(i);
-        }
-    }
+    int n = words.size();
+    vector<bool> visited(n, false);
+
+    queue<info> q;
+    q.push({begin, 0});
 
     while(!q.empty()) {
-        int idx = q.front();
+        string curr = q.front().s;
+        int step = q.front().step;
         q.pop();
 
-        if(words[idx] == target) return step[idx]; // 변환 완료
+        if(curr == target) {
+            return step;
+        }
 
-        for(int i = 0; i < size; i++) {
-            if(visited[i]) continue; // 이미 방문한 단어 pass
-
-            if(can_change(words[idx], words[i], len)) {
-                visited[i] = true;
-                step[i] = step[idx] + 1;
-                q.push(i);
+        for(int i = 0; i < n; i++) {
+            if(visited[i] || cnt_diff(curr, words[i]) != 1) {
+                continue;
             }
+            visited[i] = true;
+            q.push({words[i], step + 1});
         }
     }
     return 0;

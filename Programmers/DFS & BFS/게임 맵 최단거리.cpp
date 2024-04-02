@@ -1,30 +1,49 @@
 #include <vector>
 #include <queue>
+
 using namespace std;
 
-typedef pair<int, int> pi;
+const int EMPTY = 1;
+const int VISITED = -1;
 
-int solution(vector<vector<int> > maps)
-{
-    int n = maps.size(), m = maps[0].size(); // (지도 사이즈 : n x m)
-    int dx[4] = {0, 0, -1, 1}, dy[4] = {1, -1, 0, 0}; // 상 하 좌 우
-    vector<vector<int>> w(n, vector<int> (m, -1)); // (-1 : 경로 없음)
+struct info {
+    int row, col, cnt;
+};
 
-    queue<pi> q;
-    w[0][0] = 1; q.push({0, 0}); // 시작점
+bool is_valid_pos(int r, int c, int n, int m) {
+    return r >= 0 && r < n && c >= 0 && c < m;
+}
+
+int solution(vector<vector<int>> maps) {
+    int n = maps.size();
+    int m = maps[0].size();
+
+    int dr[4] = {-1, 1, 0, 0};
+    int dc[4] = {0, 0, -1, 1};
+
+    queue<info> q;
+    q.push({0, 0, 1});
+
     while(!q.empty()) {
-        int row = q.front().first, col = q.front().second; q.pop();
-        int weight = w[row][col];
+        int r = q.front().row;
+        int c = q.front().col;
+        int cnt = q.front().cnt;
+        q.pop();
+
+        if(r == n - 1 && c == m - 1) {
+            return cnt;
+        }
 
         for(int i = 0; i < 4; i++) {
-            int new_row = row + dy[i], new_col = col + dx[i];
-            // 아직 방문하지 않은 빈칸이 있는 경우 이동
-            if(new_row >= 0 && new_row < n && new_col >= 0 && new_col < m
-            && maps[new_row][new_col] && w[new_row][new_col] == -1) {
-                w[new_row][new_col] = weight + 1;
-                q.push({new_row, new_col});
+            int nr = r + dr[i];
+            int nc = c + dc[i];
+
+            if(!is_valid_pos(nr, nc, n, m) || maps[nr][nc] != EMPTY) {
+                continue;
             }
+            maps[nr][nc] = VISITED;
+            q.push({nr, nc, cnt + 1});
         }
     }
-    return w[n-1][m-1];
+    return -1;
 }
