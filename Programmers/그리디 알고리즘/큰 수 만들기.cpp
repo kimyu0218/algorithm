@@ -1,26 +1,32 @@
-#include <iostream>
-#include <deque>
+#include <string>
+#include <vector>
+#include <stack>
+#include <algorithm>
 
 using namespace std;
 
 string solution(string number, int k) {
     string answer = "";
 
-    deque<char> dq; // 만들 수 있는 가장 큰 수 저장하는 덱
-    int len = number.length(), cnt = 0;
+    int cnt = 0;
+    int len = number.length();
+    stack<char> s;
+
     for(int i = 0; i < len; i++) {
-        // 가장 작은 자리수(back)가 현재 수보다 작은 경우 지우기
-        while(!dq.empty() && number[i] > dq.back() && cnt < k) {
-            dq.pop_back(); cnt++;
+        char num = number[i];
+
+        while(!s.empty() && cnt < k && s.top() < num) {
+            s.pop();
+            cnt++;
         }
-        dq.push_back(number[i]);
+        s.push(num);
     }
 
-    while(dq.size() > (len-k)) dq.pop_back(); // k개만큼 지우지 못한 경우
-
-    while(!dq.empty()) {
-        answer += dq.front();
-        dq.pop_front();
+    while(!s.empty()) {
+        answer += s.top();
+        s.pop();
     }
-    return answer;
+
+    reverse(answer.begin(), answer.end());
+    return answer.substr(0, len - k);
 }
