@@ -1,37 +1,61 @@
 #include <string>
 #include <vector>
-#include <set>
+#include <algorithm>
 
 using namespace std;
 
-bool stop = false;
-vector<string> result; // 공항 경로 저장
-set<int> visited; // 사용한 티켓 번호 저장
+typedef pair<string, int> si;
 
-void bfs(string src, int n, vector<vector<string>> tickets, vector<string> route) {
-    if(stop) return; // 이미 경로 찾은 경우 더 이상 탐색하지 않음
-    route.push_back(src);
+const string ICN = "ICN";
 
-    if(visited.size() == n) {
-        result = route; stop = true;
+bool find_route = false;
+
+vector<bool> used;
+vector<string> answer;
+
+bool cmp(si &a, si &b) {
+    return a.first < b.first;
+}
+
+void backtracking(string curr, int cnt, int n, vector<vector<string>> tickets) {
+    if(find_route || cnt == n + 1) {
+        find_route = true;
         return;
     }
 
-    set<pair<string, int>> dests; // (first: 시작 공항, second: 티켓 번호)
+    vector<si> nexts;
     for(int i = 0; i < n; i++) {
-        if(visited.find(i) != visited.end()) continue;
-        if(src == tickets[i][0]) dests.insert({tickets[i][1], i}); // 목적지 추가
+        if(used[i] || curr != tickets[i][0]) {
+            continue;
+        }
+        nexts.push_back({tickets[i][1], i});
     }
 
-    for(auto iter = dests.begin(); iter != dests.end(); iter++) { // 사전순으로 먼저 탐색
-        visited.insert(iter->second); // 티켓 사용 완료
-        bfs(iter->first, n, tickets, route);
-        visited.erase(iter->second); // 티켓 사용 취소
+    sort(nexts.begin(), nexts.end(), cmp);
+
+    for(int i = 0; i < nexts.size(); i++) {
+        if(find_route) {
+            return;
+        }
+
+        string next = nexts[i].first;
+        int ticket = nexts[i].second;
+
+        used[ticket] = true;
+        answer[cnt] = next;
+        backtracking(next, cnt + 1, n, tickets);
+        used[ticket] = false;
     }
 }
 
 vector<string> solution(vector<vector<string>> tickets) {
     int n = tickets.size();
-    bfs("ICN", n, tickets, {}); // ICN 공항에서 출발
-    return result;
+
+    used.assign(n, false);
+    answer.assign(n + 1, "");
+
+    answer[0] = ICN;
+    backtracking(ICN, 1, n, tickets);
+
+    return answer;
 }
