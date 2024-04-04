@@ -1,47 +1,61 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
-vector<int> len;
+int cnt_blue_ray(int k, int n, vector<int> lectures) {
+    int answer = 1;
+    int len = lectures[0];
 
-// 블루레이 m개가 있을 때, 가능한 블루레이의 최소 크기는?
-// == 블루레이의 길이가 k일 때, 블루레이 m개를 사용하여 모든 강의를 담을 수 있는가?
-int cnt_blueray(int k, int n) { // 블루레이의 길이가 k일 때 모든 강의를 담기 위해 필요한 블루레이 개수 구하기
-    int cnt = 0, tmp = 0;
-    for(int i = 0; i < n; i++) {
-        if(tmp + len[i] > k) { cnt++; tmp = len[i]; } // 1. 현재 블루레이 길이 초과 -> 새로운 블루레이 사용
-        else tmp += len[i]; // 2. 블루레이에 현재 강의 추가
+    for(int i = 1; i < n; i++) {
+        if(len + lectures[i] <= k) {
+            len += lectures[i];
+            continue;
+        }
+        len = lectures[i];
+        answer++;
     }
-    return cnt + 1; // (tmp에 들어있는) 마지막 블루레이 추가
+    return answer;
 }
 
-int min_len(int left, int right, int n, int m) {
-    int ans = 0;
+int solution(int m, vector<int> lectures) {
+    int answer = 0;
+
+    int max_len = 0;
+    int n = lectures.size();
+    for(int i = 0; i < n; i++) {
+        max_len = max(max_len, lectures[i]);
+    }
+
+    int left = max_len;
+    int right = max_len * n;
+
     while(left <= right) {
         int mid = (left + right) / 2;
-        int blueray = cnt_blueray(mid, n);
+        int blue_ray = cnt_blue_ray(mid, n, lectures);
 
-        if(blueray <= m) { // 1. 블루레이 개수 만족 -> 블루레이 길이 줄이기
-            ans = mid;
+        if(blue_ray <= m) {
+            answer = mid;
             right = mid - 1;
         }
-        else left = mid + 1; // 2. 블루레이 개수 초과 -> 블루레이 길이 늘리기
+        else {
+            left = mid + 1;
+        }
     }
-    return ans;
+    return answer;
 }
 
 int main() {
-    int n, m, longest = 0;
+    int n, m;
+    vector<int> lectures;
+
     cin >> n >> m;
 
-    len.assign(n, 0);
-    for(int i = 0; i < n; i++) { // 강의 길이 입력
-        cin >> len[i];
-        longest = max(longest, len[i]);
+    lectures.assign(n, 0);
+    for(int i = 0; i < n; i++) {
+        cin >> lectures[i];
     }
 
-    cout << min_len(longest, longest * n, n, m);
+    cout << solution(m, lectures);
     return 0;
 }
