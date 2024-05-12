@@ -1,21 +1,25 @@
 #include <iostream>
 
 using namespace std;
+
 typedef long long ll;
 
-ll cntSmall(ll mid, ll n) { // mid보다 작거나 같은 수 세기
-    ll cnt = 0;
-    for(int i = 1; i <= n; i++) { // i : 행
-        cnt += min(mid / i, n);
+ll cnt_small(ll k, ll n) {
+    ll answer = 0;
+    for(int i = 1; i <= n; i++) {
+        answer += min(k / i, n);
     }
-    return cnt;
+    return answer;
 }
 
-ll binarySearch(ll n, int k) {
-    ll answer, left = 1, right = n * n;
+ll solution(int n, int k) {
+    ll answer = 0;
+    ll left = 1;
+    ll right = (ll) n * n;
+
     while(left <= right) {
         ll mid = (left + right) / 2;
-        ll cnt = cntSmall(mid, n);
+        ll cnt = cnt_small(mid, n);
 
         if(cnt >= k) {
             answer = mid;
@@ -32,6 +36,7 @@ int main() {
     int n, k;
 
     cin >> n >> k;
-    cout << binarySearch(n, k);
+
+    cout << solution(n, k);
     return 0;
 }

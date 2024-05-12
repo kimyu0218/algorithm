@@ -4,41 +4,56 @@
 using namespace std;
 
 typedef long long ll;
-vector<ll> len; // 랜선 길이 저장
 
-ll cnt_cable(int mid, int k) { // 길이가 mid인 랜선 개수
-    ll cnt = 0;
-    for(int i = 0; i < k; i++)
-        cnt += (len[i] / mid);
-    return cnt;
+int find_biggest(int n, vector<int> len) {
+    int answer = 0;
+    for(int i = 0; i < n; i++) {
+        answer = max(answer, len[i]);
+    }
+    return answer;
 }
 
-ll binary_search(ll left, ll right, int k, int n) {
-    ll ans;
+ll cnt_line(int k, int n, vector<int> len) {
+    ll answer = 0;
+    for(int i = 0; i < n; i++) {
+        answer += (len[i] / k);
+    }
+    return answer;
+}
+
+int solution(int n, vector<int> len) {
+    int answer = 0;
+    int m = len.size();
+
+    ll left = 1;
+    ll right = find_biggest(m, len);
+
     while(left <= right) {
         ll mid = (left + right) / 2;
-        ll cable = cnt_cable(mid, k);
+        ll line = cnt_line(mid, m, len);
 
-        if(cable >= n) { // n개의 랜선 만들기 성공 -> 최대 길이 늘리기
-            ans = mid;
+        if(line >= n) {
+            answer = mid;
             left = mid + 1;
         }
-        else right = mid - 1; // n개의 랜선 만들기 실패 -> 최대 길이 줄이기
+        else {
+            right = mid - 1;
+        }
     }
-    return ans;
+    return answer;
 }
 
 int main() {
     int k, n;
-    ll max_len = 0;
+    vector<int> len;
+
     cin >> k >> n;
 
     len.assign(k, 0);
-    for(int i = 0; i < k; i++) { // 랜선 길이 입력
+    for(int i = 0; i < k; i++) {
         cin >> len[i];
-        max_len = max(max_len, len[i]);
     }
 
-    cout << binary_search(1, max_len, k, n);
+    cout << solution(n, len);
     return 0;
 }
