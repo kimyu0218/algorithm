@@ -3,29 +3,34 @@
 
 using namespace std;
 
-int lcs(int n, vector<int> &box) {
-    vector<int> dp (n+1, 1);
-    for(int i = 0; i < n; i++) { // i : 뒤
-        for(int j = 0; j < i; j++) { // j : 앞
-            if(box[i] > box[j]) { // j 상자 넣을 수 있음
-                dp[i] = max(dp[i], dp[j]+1);
-            }
-        }
-        dp[n] = max(dp[n], dp[i]);
+const int MOD = 9901;
+
+int solution(int n) {
+    if(n == 1) {
+        return 3;
     }
-    return dp[n];
+    vector<vector<int>> dp(n, vector<int> (3, 0));
+
+    dp[0][0] = dp[0][1] = dp[0][2] = 1;
+
+    for(int i = 1; i < n; i++) {
+        dp[i][0] = (dp[i - 1][0] + dp[i - 1][1] + dp[i - 1][2]) % MOD;
+        dp[i][1] = (dp[i - 1][0] + dp[i - 1][2]) % MOD;
+        dp[i][2] = (dp[i - 1][0] + dp[i - 1][1]) % MOD;
+    }
+
+    int answer = 0;
+    for(int i = 0; i < 3; i++) {
+        answer = (answer + dp[n - 1][i]) % MOD;
+    }
+    return answer;
 }
 
 int main() {
     int n;
-    vector<int> box;
 
     cin >> n;
-    box.assign(n, 0);
-    for(int i = 0; i < n; i++) {
-        cin >> box[i];
-    }
 
-    cout << lcs(n, box);
+    cout << solution(n);
     return 0;
 }
