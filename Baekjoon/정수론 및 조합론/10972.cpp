@@ -4,14 +4,11 @@
 
 using namespace std;
 
-void solution(vector<int> arr) {
-    if(!next_permutation(arr.begin(), arr.end())) {
-        cout << -1;
-        return;
+vector<int> solution(vector<int> arr) {
+    if(next_permutation(arr.begin(), arr.end())) {
+        return arr;
     }
-    for(int i = 0; i < arr.size(); i++) {
-        cout << arr[i] << ' ';
-    }
+    return { -1 };
 }
 
 int main() {
@@ -25,6 +22,10 @@ int main() {
         cin >> arr[i];
     }
     
-    solution(arr);
+    vector<int> result = solution(arr);
+    
+    for(int i = 0; i < result.size(); i++) {
+        cout << result[i] << ' ';
+    }
     return 0;
 }
