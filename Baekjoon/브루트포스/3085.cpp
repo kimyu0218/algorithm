@@ -3,77 +3,95 @@
 
 using namespace std;
 
-int result = 0; // 상근이가 먹을 수 있는 사탕의 최대 기수
-int dx[4] = {0, 0, -1, 1}, dy[4] = {-1, 1, 0, 0};
+const int SIZE = 50;
 
-void cntCandy(int n, vector<vector<char>> board) {
+int dr[4] = { -1, 1, 0, 0 };
+int dc[4] = { 0, 0, -1, 1 };
+char board[SIZE][SIZE];
 
-    // 가로줄에 있는 사탕 개수 세기
-    for(int i = 0; i < n; i++) { // i : row
-        int cnt = 1;
-        char pre = board[i][0];
-
-        for(int j = 1; j < n; j++) { // j : col
-            if(pre != board[i][j]) {
-                result = max(result, cnt);
-                cnt = 1; pre = board[i][j];
-            }
-            else cnt++;
-        }
-        result = max(result, cnt);
-    }
-
-    // 세로줄에 있는 사탕 개수 세기
-    for(int i = 0; i < n; i++) { // i : col
-        int cnt = 1;
-        char pre = board[0][i];
-
-        for(int j = 1; j < n; j++) { // j : row
-            if(pre != board[j][i]) {
-                result = max(result, cnt);
-                cnt = 1; pre = board[j][i];
-            }
-            else cnt++;
-        }
-        result = max(result, cnt);
-    }
+void swap(char &a, char &b) {
+    char tmp = a;
+    a = b;
+    b = tmp;
 }
 
-void bomboni(int n, vector<vector<char>> board) { // 봄보니 게임
-    cntCandy(n, board); // 초기 사탕 개수 세기
+int count_horizontal(int r, int n) {
+    int answer = 1;
+    
+    int cnt = 1;
+    for(int i = 1; i < n; i++) {
+        if(board[r][i] == board[r][i - 1]) {
+            cnt++;
+            continue;
+        }
+        answer = max(answer, cnt);
+        cnt = 1;
+    }
+    return max(answer, cnt);
+}
 
+int count_vertical(int c, int n) {
+    int answer = 1;
+    
+    int cnt = 1;
+    for(int i = 1; i < n; i++) {
+        if(board[i][c] == board[i - 1][c]) {
+            cnt++;
+            continue;
+        }
+        answer = max(answer, cnt);
+        cnt = 1;
+    }
+    return max(answer, cnt);
+}
+
+int count_candy(int n) {
+    int answer = 1;
+    
     for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            char color = board[i][j];
-            for(int k = 0; k < 4; k++) { // 인접한 칸 검사
-                int nr = i + dy[k], nc = j + dx[k];
-                if(nr < 0 || nr >= n || nc < 0 || nc >= n) continue; // 보드 경계를 벗어나는 경우
-
-                char new_color = board[nr][nc];
-                if(color == new_color) continue; // 같은 색상 pass
-
-                board[i][j] = new_color; board[nr][nc] = color; // swap
-                cntCandy(n, board); // 사탕 개수 세기
-                board[i][j] = color; board[nr][nc] = new_color; // 보드 원상태로 복구
-            }
+        answer = max(answer, max(count_horizontal(i, n), count_vertical(i, n)));
+        if(answer == n) {
+            return n;
         }
     }
+    return answer;
+}
+
+int solution(int n) {
+    int answer = 1;
+    
+    for(int i = 0; i < n * n; i++) {
+        int r = i / n;
+        int c = i % n;
+        
+        for(int j = 0; j < 4; j++) {
+            int nr = r + dr[j];
+            int nc = c + dc[j];
+            if(nr < 0 || nr >= n || nc < 0 || nc >= n || board[nr][nc] == board[r][c]) {
+                continue;
+            }
+            swap(board[r][c], board[nr][nc]);
+            answer = max(answer, count_candy(n));
+            if(answer == n) {
+                return answer;
+            }
+            swap(board[r][c], board[nr][nc]);
+        }
+    }
+    return answer;
 }
 
 int main() {
     int n;
+
     cin >> n;
 
-    vector<vector<char>> board(n, vector<char>(n, '\0'));
-    string input;
-    for(int i = 0; i < n; i++) { // 사탕 색상 입력
-        cin >> input;
+    for(int i = 0; i < n; i++) {
         for(int j = 0; j < n; j++) {
-            board[i][j] = input[j];
+            cin >> board[i][j];
         }
     }
-
-    bomboni(n, board);
-    cout << result;
+    
+    cout << solution(n);
     return 0;
 }
