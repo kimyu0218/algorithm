@@ -2,36 +2,40 @@
 
 using namespace std;
 
-const int MAX = 8;
+const int SIZE = 8;
 
-bool visited[MAX];
-int result[MAX];
+bool visited[SIZE + 1];
+int arr[SIZE];
 
-void solution(int idx, int n, int m) {
-    if(idx == m) {
-        for(int i = 0; i < m; i++) {
-            cout << result[i] << ' ';
-        }
-        cout << '\n';
-        return;
+void backtracking(int idx, int m, int n) {
+  if(idx == m) {
+    for(int i = 0; i < m; i++) {
+      cout << arr[i] << ' ';
     }
+    cout << '\n';
+    return;
+  }
 
-    for(int i = 1; i <= n; i++) {
-        if(visited[i]) {
-            continue;
-        }
-        visited[i] = true;
-        result[idx] = i;
-        solution(idx + 1, n, m);
-        visited[i] = false;
+  for(int i = 1; i <= n; i++) {
+    if(visited[i]) {
+      continue;
     }
+    visited[i] = true;
+    arr[idx] = i;
+    backtracking(idx + 1, m, n);
+    visited[i] = false;
+  }
+}
+
+void solution(int n, int m) {
+  backtracking(0, m, n);
 }
 
 int main() {
-    int n, m;
+  int n, m;
 
-    cin >> n >> m;
+  cin >> n >> m;
 
-    solution(0, n, m);
-    return 0;
+  solution(n, m);
+  return 0;
 }

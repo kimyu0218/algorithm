@@ -1,38 +1,50 @@
 #include <iostream>
+#include <vector>
 #include <algorithm>
 
 using namespace std;
 
-const int MAX = 8;
-int num[MAX], arr[MAX];
+const int SIZE = 8;
+const int INF = 1e4 + 1;
 
-void backtracking(int idx, int cnt, int n, int m) {
-    if(cnt == m) { // 기저 조건
-        for(int i = 0; i < m; i++) {
-            cout << arr[i] << ' ';
-        }
-        cout << '\n';
-        return;
-    }
-    if(idx == n) { // 기저 조건
-        return;
-    }
+bool visited[SIZE];
+int arr[SIZE];
 
-    for(int i = idx; i < n; i++) {
-        arr[cnt] = num[i];
-        backtracking(i+1, cnt+1, n, m);
+vector<int> input (SIZE, INF);
+
+void backtracking(int idx, int m, int start, int n) {
+  if(idx == m) {
+    for(int i = 0; i < m; i++) {
+      cout << arr[i] << ' ';
     }
+    cout << '\n';
+    return;
+  }
+
+  for(int i = start; i < n; i++) {
+    if(visited[i]) {
+      continue;
+    }
+    visited[i] = true;
+    arr[idx] = input[i];
+    backtracking(idx + 1, m, i + 1, n);
+    visited[i] = false;
+  }
+}
+
+void solution(int n, int m) {
+  sort(input.begin(), input.end());
+  backtracking(0, m, 0, n);
 }
 
 int main() {
-    int n, m;
+  int n, m;
 
-    cin >> n >> m;
-    for(int i = 0; i < n; i++) {
-        cin >> num[i];
-    }
+  cin >> n >> m;
+  for(int i = 0; i < n; i++) {
+    cin >> input[i];
+  }
 
-    sort(num, num + n); // 오름차순 정렬
-    backtracking(0, 0, n, m);
-    return 0;
+  solution(n, m);
+  return 0;
 }

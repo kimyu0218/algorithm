@@ -17,7 +17,7 @@ void backtracking(int idx, int m, int start, int n) {
 
   for(int i = start; i <= n; i++) {
     arr[idx] = i;
-    backtracking(idx + 1, m, i + 1, n);
+    backtracking(idx + 1, m, i, n);
   }
 }
 
