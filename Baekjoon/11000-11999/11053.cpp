@@ -1,35 +1,34 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-const int MAX = 1000;
-int a[MAX+1], dp[MAX+1];
+int solution(vector<int> a) {
+  int n = a.size();
+  vector<int> dp(n + 1, 1);
 
-int lis(int n) { // LIS 구하기
-    for(int i = 1; i <= n; i++) {
-        dp[i] = 1; // 초기값 1로 세팅
-        for(int j = i-1; j > 0; j--) { // (i 이전 수열 검사)
-            // 증가 수열 && 가장 긴 수열 길이
-            if(a[i] > a[j])
-                dp[i] = max(dp[i], dp[j] + 1);
-        }
+  for(int i = 1; i < n; i++) {
+    for(int j = 0; j < i; j++) {
+      if(a[i] > a[j]) {
+        dp[i] = max(dp[i], dp[j] + 1);
+      }
     }
-
-    // 최대 길이 계산
-    int length = 0;
-    for(int i = 1; i <= n; i++) {
-        if(dp[i] > length) length = dp[i];
-    }
-    return length;
+    dp[n] = max(dp[n], dp[i]);
+  }
+  return dp[n];
 }
 
 int main() {
-    int n;
-    cin >> n;
+  int n;
+  vector<int> a;
 
-    for(int i = 1; i <= n; i++) // 수열 입력
-        cin >> a[i];
+  cin >> n;
 
-    cout << lis(n);
-    return 0;
+  a.assign(n, 0);
+  for(int i = 0; i < n; i++) {
+    cin >> a[i];
+  }
+
+  cout << solution(a);
+  return 0;
 }

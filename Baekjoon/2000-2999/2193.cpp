@@ -5,19 +5,29 @@ using namespace std;
 
 typedef long long ll;
 
-ll cntPinaryNumber(int n) {
-    vector<vector<ll>> dp(n, {0, 0});
-    dp[0] = {0, 1}; // 0으로 시작할 수 없으므로 dp[0][0] = 0
-    for(int i = 1; i < n; i++) {
-        dp[i][0] = dp[i-1][0] + dp[i-1][1];
-        dp[i][1] = dp[i-1][0]; // 1이 연달아 등장할 수 없음
-    }
-    return dp[n-1][0] + dp[n-1][1];
+ll solution(int n) {
+  ll answer = 0;
+  if(n <= 2) {
+    return 1;
+  }
+
+  vector<vector<ll>> dp(n + 2, vector<ll> (2, 0));
+  dp[1][1] = 1;
+  dp[2][0] = 1;
+
+  for(int i = 3; i <= n; i++) {
+    dp[i][0] += dp[i - 1][0] + dp[i - 1][1];
+    dp[i][1] += dp[i - 1][0];
+    answer = max(answer, dp[i][0] + dp[i][1]);
+  }
+  return answer;
 }
 
 int main() {
-    int n;
-    cin >> n;
-    cout << cntPinaryNumber(n);
-    return 0;
+  int n;
+
+  cin >> n;
+
+  cout << solution(n);
+  return 0;
 }
