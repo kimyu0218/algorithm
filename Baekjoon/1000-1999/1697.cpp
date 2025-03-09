@@ -3,37 +3,68 @@
 
 using namespace std;
 
-const int MAX = 100000;
-int position[MAX+1];
-bool visited[MAX+1];
+typedef pair<int, int> pi;
 
-void move(int prev, int next, queue<int> &q) {
-    visited[next] = true;
-    position[next] = position[prev] + 1;
-    q.push(next);
+const int MAX = 1e5;
+
+vector<int> sec;
+
+bool can_move(int x) {
+  return x >= 0 && x <= MAX && sec[x] == MAX;
+}
+
+vector<int> get_next_position(int x) {
+  vector<int> pos;
+  if(can_move(x - 1)) {
+    pos.push_back(x - 1);
+  }
+  if(can_move(x + 1)) {
+    pos.push_back(x + 1);
+  }
+  if(can_move(2 * x)) {
+    pos.push_back(2 * x);
+  }
+  return pos;
 }
 
 int bfs(int n, int k) {
-    queue<int> q;
-    q.push(n); // 시작점 push
+  queue<pi> q;
 
-    while(!q.empty()) {
-        int x = q.front(); q.pop();
-        visited[x] = true; // 방문 check
+  sec.assign(MAX + 1, MAX);
+  q.push({n, 0});
 
-        if(x == k) break;
+  while(!q.empty()) {
+    int x = q.front().first;
+    int s = q.front().second;
+    int next_s = s + 1;
+    q.pop();
 
-        if(x-1 >= 0 && x-1 <= MAX && !visited[x-1]) move(x, x-1, q);
-        if(x+1 >= 0 && x+1 <= MAX && !visited[x+1]) move(x, x+1, q);
-        if(2*x >= 0 && 2*x <= MAX && !visited[2*x]) move(x, 2*x, q);
+    if(x == k) {
+      break;
     }
-    return position[k];
+
+    vector<int> next_pos = get_next_position(x);
+    for(int j = 0; j < next_pos.size(); j++) {
+      int next = next_pos[j];
+      sec[next] = next_s;
+      q.push({next, next_s});
+    }
+  }
+  return sec[k];
+}
+
+int solution(int n, int k) {
+  if(n == k) {
+    return 0;
+  }
+  return bfs(n, k);
 }
 
 int main() {
-    int n, k;
-    cin >> n >> k;
+  int n, k;
 
-    cout << bfs(n, k);
-    return 0;
+  cin >> n >> k;
+
+  cout << solution(n, k);
+  return 0;
 }

@@ -1,61 +1,75 @@
 #include <iostream>
-#include <vector>
 #include <queue>
 
 using namespace std;
 
 typedef pair<int, int> pi;
+
 const int MAX = 1e5;
 
-pi cntCase(int n, int k) {
-    vector<int> time (MAX+1, MAX+1);
-    vector<int> cases(MAX+1, 0);
-    queue<int> q;
+int cnt[MAX];
+vector<int> sec;
 
-    // 시작점 세팅
-    time[n] = 0; // n 위치까지 이동하는 시간은 0
-    cases[n] = 1; // n 위치까지 가장 빠른 시간으로 찾는 방법의 수
-    q.push(n);
+bool can_move(int x, int s) {
+  return x >= 0 && x <= MAX && sec[x] >= s;
+}
 
-    while(!q.empty()) {
-        int x = q.front();
-        q.pop();
+vector<int> get_next_position(int x, int s) {
+  vector<int> pos;
+  if(can_move(x - 1, s)) {
+    pos.push_back(x - 1);
+  }
+  if(can_move(x + 1, s)) {
+    pos.push_back(x + 1);
+  }
+  if(can_move(2 * x, s)) {
+    pos.push_back(2 * x);
+  }
+  return pos;
+}
 
-        if(x == k) {
-            continue;
-        }
+pi bfs(int n, int k) {
+  queue<pi> q;
 
-        // 1. 걷기
-        if(x-1 >= 0 && time[x-1] >= time[x]+1) { // 1-1. x-1 이동
-            if(time[x-1] == MAX+1) {
-                q.push(x-1);
-            }
-            time[x-1] = time[x]+1;
-            cases[x-1] += cases[x];
-        }
-        if(x+1 <= MAX && time[x+1] >= time[x]+1) { // 1-2. x+1 이동
-            if(time[x+1] == MAX+1) {
-                q.push(x+1);
-            }
-            time[x+1] = time[x]+1;
-            cases[x+1] += cases[x];
-        }
-        // 2. 순간이동
-        if(2*x <= MAX && time[2*x] >= time[x]+1) {
-            if(time[2*x] == MAX+1) {
-                q.push(2*x);
-            }
-            time[2*x] = time[x]+1;
-            cases[2*x] += cases[x];
-        }
+  sec.assign(MAX + 1, MAX);
+  cnt[n] = 1;
+  q.push({n, 0});
+
+  while(!q.empty()) {
+    int x = q.front().first;
+    int s = q.front().second;
+    int next_s = s + 1;
+    q.pop();
+
+    if(x == k) {
+      break;
     }
-    return {time[k], cases[k]};
+
+    vector<int> next_pos = get_next_position(x, next_s);
+    for(int j = 0; j < next_pos.size(); j++) {
+      int next = next_pos[j];
+      sec[next] = next_s;
+      cnt[next]++;
+      q.push({next, next_s});
+    }
+  }
+  return { sec[k], cnt[k] };
+}
+
+pi solution(int n, int k) {
+  if(n == k) {
+    return { 0, 1 };
+  }
+  return bfs(n, k);
 }
 
 int main() {
-    int n, k;
-    cin >> n >> k;
-    pi answer = cntCase(n, k);
-    cout << answer.first << '\n' << answer.second;
-    return 0;
+  int n, k;
+
+  cin >> n >> k;
+
+  pi answer = solution(n, k);
+
+  cout << answer.first << '\n' << answer.second;
+  return 0;
 }
