@@ -5,49 +5,59 @@
 
 using namespace std;
 
-vector<vector<int>> edge;
-vector<int> order; // 노드 방문 순서
+const int N = 1e5;
 
-void bfs(int r) {
-    int cnt = 0;
+vector<int> graph[N + 1];
+
+vector<int> bfs(int n, int r) {
+    vector<int> answer (n, 0);
+
+    int w = 0;
     queue<int> q;
 
-    // 시작 지점 방문
-    order[r] = ++cnt; q.push(r);
-
+    q.push(r);
     while(!q.empty()) {
-        int node = q.front(); q.pop();
-        for(int i = 0; i < edge[node].size(); i++) {
-            int node2 = edge[node][i];
-            if(!order[node2]) {
-                order[node2] = ++cnt;
-                q.push(node2);
+        int v = q.front();
+        q.pop();
+
+        if(answer[v - 1]) {
+           continue;
+        }
+
+        answer[v - 1] = ++w;
+        for(int i = 0; i < graph[v].size(); i++) {
+            int u = graph[v][i];
+            if(!answer[u - 1]) {
+                q.push(u);
             }
         }
     }
+    return answer;
+}
+
+vector<int> solution(int n, int r) {
+    for(int i = 1; i <= n; i++) {
+        sort(graph[i].begin(), graph[i].end(), greater<>());
+    }
+    return bfs(n, r);
 }
 
 int main() {
-    int n, m, r;
+    int n, m, r, u, v;
+
     cin >> n >> m >> r;
 
-    edge.assign(n+1, vector<int>(0, 0));
-    order.assign(n+1, 0);
-
-    int u, v;
     while(m--) {
         cin >> u >> v;
-        // (무방향 그래프)
-        edge[u].push_back(v);
-        edge[v].push_back(u);
+
+        graph[u].push_back(v);
+        graph[v].push_back(u);
     }
 
-    for(int i = 1; i <= n; i++)
-        sort(edge[i].begin(), edge[i].end(), greater<>());
+    vector<int> answer = solution(n, r);
 
-    bfs(r);
-
-    for(int i = 1; i <= n; i++)
-        cout << order[i] << '\n';
+    for(int i = 0; i < n; i++) {
+        cout << answer[i] << '\n';
+    }
     return 0;
 }

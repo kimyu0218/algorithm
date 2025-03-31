@@ -4,44 +4,52 @@
 
 using namespace std;
 
-int cnt = 0;
-vector<vector<int>> edge;
-vector<int> order; // 노드 방문 순서
+const int N = 1e5;
 
-void dfs(int node) { // 깊이 우선 탐색 (재귀)
-    if(order[node]) return; // 이미 방문한 노드 PASS
+int w = 0;
+int visited[N + 1];
+vector<int> graph[N + 1];
 
-    // 방문 check
-    order[node] = ++cnt;
+void dfs(int v) {
+    visited[v] = ++w;
 
-    for(int i = 0; i < edge[node].size(); i++) {
-        // 아직 방문하지 않았고 node와 연결된 정점
-        int node2 = edge[node][i];
-        if(!order[node2]) dfs(node2);
+    for(int i = 0; i < graph[v].size(); i++) {
+        int u = graph[v][i];
+        if(!visited[u]) {
+            dfs(u);
+        }
     }
 }
 
+vector<int> solution(int n, int r) {
+    vector<int> answer (n, 0);
+
+    for(int i = 1; i <= n; i++) {
+        sort(graph[i].begin(), graph[i].end());
+    }
+    dfs(r);
+
+    for(int i = 1; i <= n; i++) {
+        answer[i - 1] = visited[i];
+    }
+    return answer;
+}
+
 int main() {
-    int n, m, r;
+    int n, m, r, u, v;
+
     cin >> n >> m >> r;
-
-    edge.assign(n+1, vector<int>(0, 0));
-    order.assign(n+1, 0);
-
-    int u, v;
     while(m--) {
         cin >> u >> v;
-        // (무방향 그래프)
-        edge[u].push_back(v);
-        edge[v].push_back(u);
+
+        graph[u].push_back(v);
+        graph[v].push_back(u);
     }
 
-    for(int i = 1; i <= n; i++)
-        sort(edge[i].begin(), edge[i].end());
+    vector<int> answer = solution(n, r);
 
-    dfs(r); // 깊이 우선 탐색 시작
-
-    for(int i = 1; i <= n; i++) // 노드 방문 순서 출력
-        cout << order[i] << '\n';
+    for(int i = 0; i < n; i++) {
+        cout << answer[i] << '\n';
+    }
     return 0;
 }
