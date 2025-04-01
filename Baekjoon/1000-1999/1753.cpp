@@ -6,59 +6,63 @@ using namespace std;
 
 typedef pair<int, int> pi;
 
-const int INF = 2 * 1e5;
+const int INF = 1e5 * 2;
 
-vector<int> dijkstra(int v, int k, vector<vector<pi>> adj_list) {
-    vector<int> dist(v, INF);
+vector<int> dijkstra(int n, int k, vector<vector<pi>> adj_list) {
+    vector<int> dist (n + 1, INF);
     priority_queue<pi, vector<pi>, greater<>> pq;
-
-    dist[k - 1] = 0;
-    pq.push({0, k - 1});
-
+    
+    pq.push({0, k});
+    
     while(!pq.empty()) {
-        int node = pq.top().second;
+        int w = pq.top().first;
+        int v = pq.top().second;
         pq.pop();
-
-        for(int i = 0; i < adj_list[node].size(); i++) {
-            int next = adj_list[node][i].first;
-            int w = adj_list[node][i].second;
-
-            if(dist[next] > dist[node] + w) {
-                dist[next] = dist[node] + w;
-                pq.push({dist[next], next});
+        
+        if(dist[v] <= w) {
+            continue;
+        }
+        dist[v] = w;
+        
+        for(int i = 0; i < adj_list[v].size(); i++) {
+            int nw = w + adj_list[v][i].first;
+            int u = adj_list[v][i].second;
+            
+            if(dist[u] > nw) {
+                pq.push({nw, u});
             }
         }
     }
     return dist;
 }
 
-vector<string> solution(int k, vector<vector<pi>> adj_list) {
-    int v = adj_list.size();
-    vector<string> result(v, "");
-    vector<int> dist = dijkstra(v, k, adj_list);
-
-    for(int i = 0; i < v; i++) {
-        result[i] = (dist[i] == INF ? "INF" : to_string(dist[i]));
+vector<string> solution(int n, int k, vector<vector<pi>> adj_list) {
+    vector<string> answer (n, "");
+    vector<int> dist = dijkstra(n, k, adj_list);
+    
+    for(int i = 1; i <= n; i++) {
+        answer[i - 1] = (dist[i] == INF) ? "INF" : to_string(dist[i]);
     }
-    return result;
+    return answer;
 }
 
 int main() {
     int v, e, k, eu, ev, ew;
     vector<vector<pi>> adj_list;
-
+    
     cin >> v >> e >> k;
-
-    adj_list.assign(v, vector<pi> (0));
+    
+    adj_list.assign(v + 1, vector<pi> (0));
     while(e--) {
         cin >> eu >> ev >> ew;
-        adj_list[eu - 1].push_back({ev - 1, ew});
+        
+        adj_list[eu].push_back({ew, ev});
     }
-
-    vector<string> result = solution(k, adj_list);
-
-    for(int i = 0; i < v; i++) {
-        cout << result[i] << '\n';
+    
+    vector<string> answer = solution(v, k, adj_list);
+    
+    for(int i = 0; i < answer.size(); i++) {
+        cout << answer[i] << '\n';
     }
     return 0;
 }
